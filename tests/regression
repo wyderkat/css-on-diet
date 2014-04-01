@@ -2,7 +2,10 @@
 REDIRECT_DBG=/dev/null # NO debug
 #REDIRECT_DBG=/dev/stdout # DEBUG
 
-RM_FLAG="notemptystring"
+TARBALL=$1
+shift
+VERDIR=$1
+shift
 
 test_application_start() { application_start; }
 test_switches() { switches; }
@@ -16,9 +19,9 @@ test_file_formats() { file_formats; }
 oneTimeSetUp()
 {
   COD_TMP_DIR=`mktemp -d --tmpdir cod-XXX`
-  tar xfJ ../cod.xz -C "$COD_TMP_DIR" #> /dev/null
-  COD_DIR="$COD_TMP_DIR"
-  COD="$COD_TMP_DIR"/cod
+  tar xfz ../$TARBALL -C "$COD_TMP_DIR" #> /dev/null
+  COD_DIR="$COD_TMP_DIR/$VERDIR"
+  COD="$COD_DIR"/cod
 }
 
 oneTimeTearDown()

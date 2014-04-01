@@ -4,21 +4,34 @@
 # Licensed under GPL-v3
 ##
 
-SRC=cod Makefile tests version wyderkat LICENSE
+DIST=cod version LICENSE README.md
+VERSION=$(shell cat cod | grep -E '^VERSION *= *".*"' | grep -oE '[0-9\.]+')
+VERDIR=cod-$(VERSION)
+TARBALL=$(VERDIR).tgz
 
 all: test
 
-cod.xz: $(SRC)
-	tar cfJ $@ $^
+$(TARBALL): $(DIST)
+	@mkdir $(VERDIR)
+	@cp $^ $(VERDIR)
+	@tar cfz $@ $(VERDIR)
+	@rm -r $(VERDIR)
 
-test: cod.xz
-	@cd tests && bash regression
-
+test: $(TARBALL)
+	@cd tests && bash regression $(TARBALL) $(VERDIR)
 
 # make_version has to be first
-dist: make_version cod.xz
+dist: make_version $(TARBALL)
+
+d: $(TARBALL)
+
+cofoh: $(TARBALL)
+	scp $^ Cofoh:cofoh/f/
+
+pub: cofoh
+
 
 make_version:
 	@./wyderkat/versioning.py
 
-.PHONY: clean test dist all make_version 
+.PHONY: clean test dist all make_version cofoh pub
