@@ -1,0 +1,92 @@
+#!/bin/bash
+REDIRECT_DBG=/dev/null # NO debug
+#REDIRECT_DBG=/dev/stdout # DEBUG
+
+RM_FLAG="notemptystring"
+
+test_application_start() { application_start; }
+test_switches() { switches; }
+test_preserve_comments1() { one2one comments1; }
+test_defines1() { one2one defines1; }
+test_header1() { one2one header1; }
+test_arithmetics1() { one2one arythmetics1; }
+test_file_formats() { file_formats; }
+
+
+oneTimeSetUp()
+{
+  COD_TMP_DIR=`mktemp -d --tmpdir cod-XXX`
+  tar xfJ ../cod.xz -C "$COD_TMP_DIR" #> /dev/null
+  COD_DIR="$COD_TMP_DIR"
+  COD="$COD_TMP_DIR"/cod
+}
+
+oneTimeTearDown()
+{
+  #log=log.SL.`date +%Y-%m-%d__%H-%M-%S`.log.bz2
+  #mv "$SL_DIR"/logs/SL.log.bz2 ../$log
+  #echo "Log file: $log"
+  rm -r "$COD_TMP_DIR"
+}
+
+
+application_start()
+{
+  assertTrue "Cannot start cod executable" "$COD -h"
+}
+
+switches()
+{
+  in=file.cod
+  out=file.result.css
+  expected=file.css
+
+  $COD $in -f $out
+  assertSame "execution error" 0 $?
+
+  assertTrue "wrong result file" \
+    "cmp <(tail -n +2 $expected) <(tail -n +2 $out)" # start from 2nd line
+}
+
+one2one()
+{
+  in=$1.cod
+  out=$1.result.css
+  expected=$1.css
+
+  $COD $in > $out
+
+  assertSame "execution error" 0 $?
+
+  assertTrue "wrong result file" \
+    "cmp <(tail -n +2 $expected) <(tail -n +2 $out)" # start from 2nd line
+}
+
+file_formats()
+{
+  one2one ffunix
+  one2one ffmac
+  one2one ffdos
+  one2one ffmix
+}
+
+
+
+
+
+application_logging()
+{
+  LOG=$SL_DIR/logs/SL.log.bz2 
+  assertTrue "Cannot find SL.py main log file!" "[ -r $LOG ]"
+  check_sum_before=`md5sum $LOG`
+  out=`sl_send "Wrong command;"`
+  check_sum_after=`md5sum $LOG`
+  assertNotSame "Log file is not updating!" "$check_sum_before" "$check_sum_after"
+
+}
+
+
+# TEST ENGINE
+. ./shunit2
+
+# vim: tw=0:

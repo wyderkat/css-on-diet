@@ -1,0 +1,686 @@
+#!/usr/bin/env python
+###
+# Copyright 2014 Tomasz Wyderka <wyderkat@cofoh.com>
+#  www.cofoh.com
+# Licensed under GPL-v3
+##
+VERSION = "1.0"
+PROToVERSION = "1.0"
+
+PROPERTyMNEMONICS = {
+  "col":"color",
+  "wid":"width",
+  "hei":"height",
+  "bac":"background-color",
+  "bai":"background-image",
+  "bap":"background-position",
+  "ba-":"background",
+  "bas":"background-size",
+  "bar":"background-repeat",
+  "bal":"background-clip",
+  "bao":"background-origin",
+  "dis":"display",
+  "con":"content",
+  "fos":"font-size",
+  "fow":"font-weight",
+  "fof":"font-family",
+  "fot":"font-style",
+  "fo-":"font",
+  "fov":"font-variant",
+  "pos":"position",
+  "pa-":"padding",
+  "pal":"padding-left",
+  "pat":"padding-top",
+  "pab":"padding-bottom",
+  "par":"padding-right",
+  "ma-":"margin",
+  "mal":"margin-left",
+  "mat":"margin-top",
+  "mab":"margin-bottom",
+  "mar":"margin-right",
+  "flo":"float",
+  "top":"top",
+  "lih":"line-height",
+  "b--":"border",
+  "bb-":"border-bottom",
+  "bbc":"border-bottom-color",
+  "bbl":"border-bottom-left-radius",
+  "bbr":"border-bottom-right-radius",
+  "bbs":"border-bottom-style",
+  "bbw":"border-bottom-width",
+  "bcp":"border-collapse",
+  "bco":"border-color",
+  "bi-":"border-image",
+  "bio":"border-image-outset",
+  "bir":"border-image-repeat",
+  "bil":"border-image-slice",
+  "bis":"border-image-source",
+  "biw":"border-image-width",
+  "bl-":"border-left",
+  "blc":"border-left-color",
+  "bls":"border-left-style",
+  "blw":"border-left-width",
+  "bra":"border-radius",
+  "br-":"border-right",
+  "brc":"border-right-color",
+  "brs":"border-right-style",
+  "brw":"border-right-width",
+  "bsp":"border-spacing",
+  "bst":"border-style",
+  "bt-":"border-top",
+  "btc":"border-top-color",
+  "btl":"border-top-left-radius",
+  "btr":"border-top-right-radius",
+  "bts":"border-top-style",
+  "btw":"border-top-width",
+  "bwi":"border-width",
+  "lef":"left",
+  "tea":"text-align",
+  "ted":"text-decoration",
+  "tet":"text-transform",
+  "tes":"text-shadow",
+  "tei":"text-indent",
+  "teo":"text-overflow",
+  "ter":"text-rendering",
+  "zin":"z-index",
+  "vea":"vertical-align",
+  "ov-":"overflow",
+  "ovx":"overflow-x",
+  "ovy":"overflow-y",
+  "opa":"opacity",
+  "cle":"clear",
+  "les":"letter-spacing",
+  "cur":"cursor",
+  "rig":"right",
+  "ouc":"outline-color",
+  "ou-":"outline",
+  "ous":"outline-style",
+  "ouo":"outline-offset",
+  "ouw":"outline-width",
+  "bot":"bottom",
+  "li-":"list-style",
+  "lit":"list-style-type",
+  "lii":"list-style-image",
+  "lio":"list-style-position",
+  "bos":"box-shadow",
+  "boz":"box-sizing",
+  "zoo":"zoom",
+  "maw":"max-width",
+  "miw":"min-width",
+  "mih":"min-height",
+  "mah":"max-height",
+  "fil":"filter",
+  "whs":"white-space",
+  "vis":"visibility",
+  "wos":"word-spacing",
+  "wob":"word-break",
+  "wow":"word-wrap",
+  "an-":"animation",
+  "ann":"animation-name",
+  "and":"animation-duration",
+  "ant":"animation-timing-function",
+  "any":"animation-delay",
+  "ani":"animation-iteration-count",
+  "anr":"animation-direction",
+  "anf":"animation-fill-mode",
+  "anp":"animation-play-state",
+  "tf-":"transform",
+  "tfo":"transform-origin",
+  "tfs":"transform-style",
+  "ti-":"transition",
+  "tiy":"transition-delay",
+  "tid":"transition-duration",
+  "tip":"transition-property",
+  "tit":"transition-timing-function",
+}
+
+VALUeMNEMONICS = {
+  "!i":"!important",
+  "%%":"100%",
+  "ab":"absolute",
+  "al":"all",
+  "au":"auto",
+  "ba":"baseline",
+  "bb":"border-box",
+  "bh":"both",
+  "bl":"block",
+  "bo":"bold",
+  "bt":"bottom",
+  "ca":"capitalize",
+  "cb":"content-box",
+  "ce":"center",
+  "da":"dashed",
+  "db":"double",
+  "de":"default",
+  "do":"dotted",
+  "ea":"ease",
+  "ei":"ease-in",
+  "eo":"ease-out",
+  "fi":"fixed",
+  "hi":"hidden",
+  "ib":"inline-block",
+  "if":"infinite",
+  "ih":"inherit",
+  "ii":"initial",
+  "il":"inline",
+  "io":"ease-in-out",
+  "is":"inset",
+  "it":"italic",
+  "le":"left",
+  "li":"linear",
+  "lo":"lowercase",
+  "mi":"middle",
+  "nm":"normal",
+  "no":"none",
+  "nr":"no-repeat",
+  "nw":"nowrap",
+  "pb":"padding-box",
+  "po":"pointer",
+  "re":"relative",
+  "ri":"right",
+  "rx":"repeat-x",
+  "ry":"repeat-y",
+  "so":"solid",
+  "st":"static",
+  "ta":"table",
+  "to":"top",
+  "tr":"transparent",
+  "un":"underline",
+  "up":"uppercase",
+  "vi":"visible",
+  "wh":"white",
+}
+
+UNItMNEMONICS = {
+  "p":"px",
+  "e":"em",
+  "i":"in",
+  "c":"cm",
+  "m":"mm",
+  "x":"ex",
+}
+
+import argparse
+import re
+import sys
+from os import path
+
+APpDIr = path.dirname( path.realpath(__file__) )
+
+NESTEdRe = re.compile( r"\*/" )
+
+class a_cut( object ):
+  """
+  A cut string. For us this is CSS content where comments are cut out,
+  but their positions and values are stored and can be recovered.
+  Positions are shifting when content is changing, accordingly.
+  """
+  def __init__( me, str ):
+    me.str = str # visible content
+    me.oryg = str # oryginal content
+    me.cutregister = [] # register with cut comments and positions
+
+  def __str__( me ):
+    return me.str
+
+  def set( me, str ):
+    me.str = str
+
+  def rm_and_save( me, indexes ):
+    """ 
+    cut data (like comments) and save them in register for later recover
+    """
+    result = ""
+    last = 0
+    for start,end in indexes:
+      result += me.str[ last : start ]
+      tosave = me.str[ start: end ]
+      tail = -2 # not to re-nest
+      # extract cpp comments
+      if tosave[:2] == "//":
+        tosave = "/*" + tosave[2:] + "*/"
+        tail = -2
+      # re-nest nested comments
+      tosave = NESTEdRe.sub( "*-/", tosave[:tail] ) + tosave[tail:]
+      #
+      me.cutregister.append( ( start-last, tosave ) )
+      last = end
+    result += me.str[ last : ]
+    me.str = result
+
+  def recover_me( me ):
+    """
+    recover data (like comments) from register
+    """
+    counter=0
+    for pos,data in me.cutregister:
+      counter += pos
+      me.str = me.str[ : counter ] + data + me.str[ counter : ]
+      counter += len(data)
+    me.cutregister = []
+
+  def sub_text( me, indexeswithdata ):
+    """
+    for start,end,repl in indexeswithdata:
+      substitute text start-end by repl
+      update cut register for new positions !
+    """
+
+    newstr = "" # substituted string, concatenated by iteration
+    laststridx = 0 # pos of last character in string
+    newcutreg = [] # updated cut register, constructed by iteration
+    lastregidx = 0 # pos of last visited record in register
+    absolutregpos = 0 # absolute register position, because register keeps only relative 
+    # position from last record. 
+
+    # following loop assumes indexeswithdata and cutregister are sorted!
+    again = False # flag for visiting register record more than once 
+    for start,end,data in indexeswithdata:
+      # SUBSTITUTE
+      newstr += me.str[ laststridx : start ] + data
+      laststridx = end # for next substitude iteration
+
+      # starting from lastregidx up to place where "cut" is found
+      # and break then!
+      for i in xrange( lastregidx, len(me.cutregister) ):
+        if not again:
+          absolutregpos += me.cutregister[i][0]
+        # condition to check if cut should be updated
+        # it works because als cuts before are skipped in the 
+        # "else" statement below
+        if absolutregpos > start:
+          #how much substitute changed text
+          delta = len(data) - (end-start) 
+          if not again:
+            # update register from oryginal
+            newcutreg.append(  ( me.cutregister[i][0] + delta, me.cutregister[i][1] )  )
+            again = True
+          else:
+            #update register alredy updated
+            newcutreg[i] = ( newcutreg[i][0] + delta, newcutreg[i][1] )
+          break
+        else:
+          if not again:
+            # copy record without updating. not needed
+            newcutreg.append( me.cutregister[i] ) 
+          lastregidx += 1 # skip this record next iteration
+          again = False
+
+    # copy rest of the string
+    newstr += me.str[ laststridx : ]
+    # copy rest of register
+    againfix = 1 if again else 0
+    for i in xrange( lastregidx + againfix, len(me.cutregister) ):
+      newcutreg.append( me.cutregister[i] )
+    
+    # save str and register
+    # We need to do it at the end because all indexes are from oryginal string
+    me.str = newstr
+    #
+    me.cutregister = []
+    fixnext = 0 # fix next pos which is relative to previous 
+    for pos,data in newcutreg:
+      pos += fixnext
+      fixnext = 0
+      if pos < 0: # negative registers
+        # remove them
+        pass
+        # uncomment if we want to preserve negative comments
+        #me.cutregister.append( (0, data) )
+        fixnext = pos
+      else:
+        me.cutregister.append( (pos, data) )
+
+
+
+COMMENTsRe = re.compile( r"""
+                        //   |
+                        \n   |
+                        /\*  |
+                        \*/  
+                        """, re.X ) 
+
+def rm_comments( cut ):
+  nocomment = 0 # no inside comment
+  c = 1 # c-like comments, but nested
+  cpp = 2 # c++like comments
+
+  mode = nocomment
+  clevel = 0 # nesting level of c-like comments
+  matchesidx = []
+
+  # in pure RE we cannot find nestesd structuries
+  # so we are just finding all boundires and parse it here
+  matches = COMMENTsRe.finditer( str(cut) )
+  start = 0
+  for i in matches:
+    m = i.group()
+    if mode == cpp:
+      if m == "\n":
+        matchesidx.append( ( start, i.end()-1 ) ) # -1 because without \n
+        mode = nocomment
+    elif mode == c:
+      if m == "/*":
+        clevel += 1
+      if m == "*/":
+        clevel -= 1
+      if clevel == 0:
+        matchesidx.append( ( start, i.end() ) )
+        mode = nocomment
+    else:
+      if m == "//":
+        start = i.start()
+        mode = cpp
+      elif m == "/*":
+        start = i.start()
+        mode = c
+        clevel += 1
+    
+  cut.rm_and_save( matchesidx )
+
+DEFINEsBLOCkRe = re.compile( r"""
+  @cod-defines
+  \s*
+  {
+  (.*?) # everything up to close
+  }
+                            """, re.X|re.S ) 
+DEFINeNAMeCHAr = r"[-\w]"
+DEFINEsRe = re.compile( r"""
+  (?P<name>%s+)   # some freedom in naming
+  [ \t\r\f\v]*       # not \n! can be empty when no body
+  (?P<body>.*?)      # can be empty
+  $                  # end of line or text
+                       """ % DEFINeNAMeCHAr, re.X|re.M ) 
+
+class a_defines(object):
+  def __init__( me ):
+    me.dictin = {}
+    me.dictout = {}
+  def add( me, name, body ):
+    pat1 = r"(?<!%s)" % DEFINeNAMeCHAr
+    pat2 = re.escape( name ) 
+    pat3 = r"(?!%s)" % DEFINeNAMeCHAr
+    pat4 = r"(?:\s*\((.*?)\))?" # optional parentheses
+
+    patin = re.compile( pat2 + pat4 ) 
+    patout = re.compile( pat1 + pat2 + pat3 + pat4 ) 
+
+    me.dictin[name] = (body, patin)
+    me.dictout[name] = (body, patout)
+  def get_all(me, out):
+    if out:
+      return me.dictout.values()
+    else:
+      return me.dictin.values()
+
+def read_defines( cut ):
+  match = DEFINEsBLOCkRe.search( str(cut) )
+  defines = a_defines()
+  if match:
+    definesblock = match.group(1)
+    cut.sub_text( [ ( match.start(), match.end(), "" ) ] )
+
+    definesmatch = DEFINEsRe.finditer( definesblock )
+    for d in definesmatch:
+      name = d.group("name") 
+      body = d.group("body")
+      # self expand
+      body = expand_defines( defines, body )
+      #
+      defines.add( name, body )
+  return defines
+
+DEFINeARGUMENt = re.compile( r"_ARG(\d+)_" )
+
+def expand_defines( defines, cutorstr ):
+  if type( cutorstr ) == type( "" ):
+    cut = False
+  else:
+    cut = True
+  
+  for defbody,defpat in defines.get_all( cut ):
+
+    defcandidate = re.finditer( defpat, str(cutorstr) )
+    tocutit = []
+    for d in defcandidate:
+      # find arguments 
+      argumentsstring = d.group(1)
+      arguments = []
+      if argumentsstring:
+        argumentslist = argumentsstring.split(",")
+        for a in argumentslist:
+          arguments.append( a.strip() )
+      # apply arguments
+      if arguments:
+        defbody = DEFINeARGUMENt.sub( 
+          lambda x: expand_argument(arguments,x), defbody )
+
+      if cut:
+        tocutit.append( ( d.start(), 
+                          d.end(), 
+                          defbody ) )
+      else: # cut object
+        cutorstr = cutorstr[:d.start()] + defbody + cutorstr[d.end():]
+
+    if tocutit:
+      cutorstr.sub_text( tocutit )
+
+  return cutorstr
+      
+def expand_argument( arguments, matchobject ):
+  no = int( matchobject.group(1) )
+  try:
+    return arguments[ no - 1]
+  except IndexError:
+    # TODO log
+    return ""
+
+ARITHMETIcRe = re.compile( r"""
+    \s          # has to be sourrounded by white characters
+    (           # main body - no white spaces
+    (?:
+    [()\-+*/.]| # possible operators
+    \d+px?|     # digit with unit
+    \d+%|       # ...
+    \d+em?|
+    \d+in?|
+    \d+cm?|
+    \d+mm?|
+    \d+e?x|
+    \d+pt|
+    \d+pc|
+    \d+         # has to be at the end - no unit
+    )+
+    )
+    (?=\s)   # TODO should be lookahead- because space is taken out for next expression
+                       """,  re.X | re.S ) 
+ARITHMETIcUNITsRe = re.compile( r"""
+    px?|
+    %|
+    em?|
+    in?|
+    cm?|
+    mm?|
+    e?x|
+    pt|
+    pc
+                       """,  re.X ) 
+ARITHMETIcAtLEAStTWoRe = re.compile( r"""
+    [\-+*/][\d(]
+                       """,  re.X ) 
+
+def reduce_arithmetic( cut ):
+  tochange = []
+  arith = ARITHMETIcRe.finditer( str(cut) )
+  for a in arith:
+    astr = a.group(1)
+    if not ARITHMETIcAtLEAStTWoRe.search( astr ):
+      continue # at least one operator and digit to be arythmetic expression
+    ( expr, unit ) = get_arithmetic_units( astr )
+    try:
+      result = eval(expr, {})
+    except SyntaxError:
+      continue
+    resultstr = str(result)
+    if unit:
+      resultstr += unit
+    tochange.append( ( a.start(1), 
+                       a.end(1), 
+                       resultstr ) )
+  cut.sub_text( tochange )
+    
+    
+def get_arithmetic_units( a ):
+  """naive assumption that units will be the same"""
+  """ returns first found unit """
+  # TODO unit recalculations
+  unit = None
+  all = ARITHMETIcUNITsRe.finditer( a )
+  for u in all:
+    if unit==None:
+      unit = u.group()
+    else:
+      if unit != u.group():
+        pass # wrong unit - TODO 
+  # remove units
+  a = ARITHMETIcUNITsRe.sub( "", a )
+  return (a, unit)
+
+
+SEtRe = re.compile( r"{(.*?)}", re.S )
+
+RULeRe = re.compile( r"""
+(?P<param>[\w\-]+) # parameter
+(?P<sep>[\s:]+) # optional separator
+(?P<value>[^;\n]+) # value
+(?P<delim>[;\n]?) # delimeter
+""", re.S | re.M | re.X ) 
+
+VALUeRe = re.compile( r"(\S+\s*\(.*?\)|\S+)"  )
+UNItRe = re.compile( r"\b\d+([a-z])\b" )
+  
+def put_on_diet( cut ):
+  sets = SEtRe.finditer( str(cut) )
+  abbmatch = [] # has to be ordered
+  for s in sets:
+
+    rules = RULeRe.finditer( str(cut), s.start(1), s.end(1) )
+    for rule in rules:
+
+      if rule.group("param") in PROPERTyMNEMONICS:
+        abbmatch.append( ( rule.start("param"), 
+                             rule.end("param"), 
+                             PROPERTyMNEMONICS[ rule.group("param") ] ) )
+
+      if not ":" in rule.group("sep"):
+        abbmatch.append( ( rule.start("sep"), 
+                           rule.start("sep"), # insert at the begining
+                           ":" ) )
+
+
+      values = VALUeRe.finditer( str(cut), rule.start("value"), rule.end("value") )
+      for val in values:
+        if val.group(1) in VALUeMNEMONICS:
+          abbmatch.append( ( val.start(1), 
+                               val.end(1), 
+                               VALUeMNEMONICS[ val.group(1) ] ) )
+        else:
+          units = UNItRe.finditer( str(cut), val.start(1), val.end(1) )
+          for unit in units:
+            if unit.group(1) in UNItMNEMONICS:
+              abbmatch.append( ( unit.start(1), 
+                                   unit.end(1), 
+                                   UNItMNEMONICS[ unit.group(1) ] ) )
+
+
+
+      if rule.group("delim") == "\n":
+        abbmatch.append( ( rule.start("delim"), 
+                           rule.start("delim"), # insert at the begining
+                           ";" ) )
+
+  cut.sub_text( abbmatch )
+
+
+HEADErRe = re.compile( r"^//!(.*?)\n", re.S )
+def extract_header( cut ):
+  vendor=None
+  m = HEADErRe.search( str(cut) )
+  if m:
+    vendor = m.group(1)
+    cut.set(  HEADErRe.sub("", str(cut) )  )
+  return vendor
+
+def add_header( cut ):
+  header = "/* Generated by oryginal css-on-diet v%s */\n"  % VERSION
+  cut.set( header + str(cut) )
+
+
+def main( a ):
+  handleout = open(a.f, 'w') if a.f!="-" else sys.stdout
+  for f in args.cod_files:
+    fh = open(f, "U")
+    content = fh.read()
+    nlcharacter = get_nlcharacter( fh )
+    fh.close()
+    contentcut= a_cut( content )
+    extract_header( contentcut )
+    rm_comments( contentcut )
+    definesdict = read_defines( contentcut )
+    expand_defines( definesdict, contentcut )
+    reduce_arithmetic( contentcut )
+    put_on_diet( contentcut )
+
+    contentcut.recover_me() 
+    add_header( contentcut )
+
+    content = str(contentcut)
+    if nlcharacter != None:
+      content = content.replace("\n", nlcharacter )
+
+    handleout.write( content )
+    if handleout is not sys.stdout:
+      handleout.close()
+
+def get_nlcharacter( hdl ):
+  nl = None
+  # TODO improvement:
+  # when hdl.newlines == "\n" skip replace
+  if type(hdl.newlines) == type(""):
+    nl = hdl.newlines
+  elif type(hdl.newlines) == type(()):
+    if "\r\n" in hdl.newlines:
+      nl = "\r\n" # priority for dos
+    elif "\n" in hdl.newlines:
+      nl = "\n" # than unix
+    else:
+      nl = hdl.newlines[0] # should be mac and never reach here
+  return nl
+
+
+
+if __name__ == "__main__":
+
+  parser = argparse.ArgumentParser(
+    description=
+"""CSS On Diet
+===========
+Preprocessor for CSS files.
+-------------------------
+www.cofoh.com/css-on-diet""",
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+  )
+
+  parser.add_argument('cod_files', metavar='file.cod', nargs="+",
+                      help='Css-on-diet file list to process')
+
+  parser.add_argument(
+    '-f', metavar="output.css",
+    default="-",
+    help='file to save result css. If not given or "-" string, print to STDOUT'
+  )
+  # FINISH
+  args = parser.parse_args()
+
+  main( args )

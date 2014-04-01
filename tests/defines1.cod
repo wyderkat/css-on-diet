@@ -1,0 +1,14 @@
+@cod-defines {
+  MAR 12
+  CAR MAR19
+  GOT 14_ARG1_MAR_ARG2_
+  MACROGOT GOT(14,12)
+}
+
+// before
+li {
+  ma- MAR/*  */
+  mal CAR 
+  pa- GOT(ola , pies  kot ) /* dwa */
+  mar MACROGOT
+}

@@ -1,0 +1,21 @@
+//!cofoh.com/css-on-diet-1.0
+
+@cod-defines {
+  MYCAR 12p+3p
+  CAR (MYCAR)*2
+}
+li {
+  mal 200p
+  mal 200p+20
+  mal 200p-20*3
+  mal 200p-2**2
+  mal 200p+300i
+  mal CAR
+  mal20+3 // no white spaces around
+  mal 20+4   +4 // whitespace inside
+  mal 20+4 4+4 // one space separator
+  mal 21/5  // integer division
+  mal 21/5.00 // floats
+}
+
+
