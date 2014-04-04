@@ -493,7 +493,7 @@ ARITHMETIcRe = re.compile( r"""
     \d+         # has to be at the end - no unit
     )+
     )
-    (?=\s)   # TODO should be lookahead- because space is taken out for next expression
+    (?=\s)   
                        """,  re.X | re.S ) 
 ARITHMETIcUNITsRe = re.compile( r"""
     px?|
@@ -645,8 +645,6 @@ def main( a ):
 
 def get_nlcharacter( hdl ):
   nl = None
-  # TODO improvement:
-  # when hdl.newlines == "\n" skip replace
   if type(hdl.newlines) == type(""):
     nl = hdl.newlines
   elif type(hdl.newlines) == type(()):
