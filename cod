@@ -205,9 +205,9 @@ import re
 import sys
 from os import path
 
-APpDIr = path.dirname( path.realpath(__file__) )
+APpDIR = path.dirname( path.realpath(__file__) )
 
-NESTEdRe = re.compile( r"\*/" )
+NESTEdRE = re.compile( r"\*/" )
 
 class a_cut( object ):
   """
@@ -241,7 +241,7 @@ class a_cut( object ):
         tosave = "/*" + tosave[2:] + "*/"
         tail = -2
       # re-nest nested comments
-      tosave = NESTEdRe.sub( "*-/", tosave[:tail] ) + tosave[tail:]
+      tosave = NESTEdRE.sub( "*-/", tosave[:tail] ) + tosave[tail:]
       #
       me.cutregister.append( ( start-last, tosave ) )
       last = end
@@ -333,7 +333,7 @@ class a_cut( object ):
 
 
 
-COMMENTsRe = re.compile( r"""
+COMMENTsRE = re.compile( r"""
                         //   |
                         \n   |
                         /\*  |
@@ -351,7 +351,7 @@ def rm_comments( cut ):
 
   # in pure RE we cannot find nestesd structuries
   # so we are just finding all boundires and parse it here
-  matches = COMMENTsRe.finditer( str(cut) )
+  matches = COMMENTsRE.finditer( str(cut) )
   start = 0
   for i in matches:
     m = i.group()
@@ -378,29 +378,29 @@ def rm_comments( cut ):
     
   cut.rm_and_save( matchesidx )
 
-DEFINEsBLOCkRe = re.compile( r"""
+DEFINEsBLOCkRE = re.compile( r"""
   @cod-defines
   \s*
   {
   (.*?) # everything up to close
   }
                             """, re.X|re.S ) 
-DEFINeNAMeCHAr = r"[-\w]"
-DEFINEsRe = re.compile( r"""
+DEFINeNAMeCHAR = r"[-\w]"
+DEFINEsRE = re.compile( r"""
   (?P<name>%s+)   # some freedom in naming
   [ \t\r\f\v]*       # not \n! can be empty when no body
   (?P<body>.*?)      # can be empty
   $                  # end of line or text
-                       """ % DEFINeNAMeCHAr, re.X|re.M ) 
+                       """ % DEFINeNAMeCHAR, re.X|re.M ) 
 
 class a_defines(object):
   def __init__( me ):
     me.dictin = {}
     me.dictout = {}
   def add( me, name, body ):
-    pat1 = r"(?<!%s)" % DEFINeNAMeCHAr
+    pat1 = r"(?<!%s)" % DEFINeNAMeCHAR
     pat2 = re.escape( name ) 
-    pat3 = r"(?!%s)" % DEFINeNAMeCHAr
+    pat3 = r"(?!%s)" % DEFINeNAMeCHAR
     pat4 = r"(?:\s*\((.*?)\))?" # optional parentheses
 
     patin = re.compile( pat2 + pat4 ) 
@@ -415,13 +415,13 @@ class a_defines(object):
       return me.dictin.values()
 
 def read_defines( cut ):
-  match = DEFINEsBLOCkRe.search( str(cut) )
+  match = DEFINEsBLOCkRE.search( str(cut) )
   defines = a_defines()
   if match:
     definesblock = match.group(1)
     cut.sub_text( [ ( match.start(), match.end(), "" ) ] )
 
-    definesmatch = DEFINEsRe.finditer( definesblock )
+    definesmatch = DEFINEsRE.finditer( definesblock )
     for d in definesmatch:
       name = d.group("name") 
       body = d.group("body")
@@ -431,7 +431,7 @@ def read_defines( cut ):
       defines.add( name, body )
   return defines
 
-DEFINeARGUMENt = re.compile( r"_ARG(\d+)_" )
+DEFINeARGUMENT = re.compile( r"_ARG(\d+)_" )
 
 def expand_defines( defines, cutorstr ):
   if type( cutorstr ) == type( "" ):
@@ -453,7 +453,7 @@ def expand_defines( defines, cutorstr ):
           arguments.append( a.strip() )
       # apply arguments
       if arguments:
-        defbody = DEFINeARGUMENt.sub( 
+        defbody = DEFINeARGUMENT.sub( 
           lambda x: expand_argument(arguments,x), defbody )
 
       if cut:
@@ -476,7 +476,7 @@ def expand_argument( arguments, matchobject ):
     # TODO log
     return ""
 
-ARITHMETIcRe = re.compile( r"""
+ARITHMETIcRE = re.compile( r"""
     \s          # has to be sourrounded by white characters
     (           # main body - no white spaces
     (?:
@@ -495,7 +495,7 @@ ARITHMETIcRe = re.compile( r"""
     )
     (?=\s)   
                        """,  re.X | re.S ) 
-ARITHMETIcUNITsRe = re.compile( r"""
+ARITHMETIcUNITsRE = re.compile( r"""
     px?|
     %|
     em?|
@@ -506,16 +506,16 @@ ARITHMETIcUNITsRe = re.compile( r"""
     pt|
     pc
                        """,  re.X ) 
-ARITHMETIcAtLEAStTWoRe = re.compile( r"""
+ARITHMETIcAtLEAStTWoRE = re.compile( r"""
     [\-+*/][\d(]
                        """,  re.X ) 
 
 def reduce_arithmetic( cut ):
   tochange = []
-  arith = ARITHMETIcRe.finditer( str(cut) )
+  arith = ARITHMETIcRE.finditer( str(cut) )
   for a in arith:
     astr = a.group(1)
-    if not ARITHMETIcAtLEAStTWoRe.search( astr ):
+    if not ARITHMETIcAtLEAStTWoRE.search( astr ):
       continue # at least one operator and digit to be arythmetic expression
     ( expr, unit ) = get_arithmetic_units( astr )
     try:
@@ -536,7 +536,7 @@ def get_arithmetic_units( a ):
   """ returns first found unit """
   # TODO unit recalculations
   unit = None
-  all = ARITHMETIcUNITsRe.finditer( a )
+  all = ARITHMETIcUNITsRE.finditer( a )
   for u in all:
     if unit==None:
       unit = u.group()
@@ -544,28 +544,28 @@ def get_arithmetic_units( a ):
       if unit != u.group():
         pass # wrong unit - TODO 
   # remove units
-  a = ARITHMETIcUNITsRe.sub( "", a )
+  a = ARITHMETIcUNITsRE.sub( "", a )
   return (a, unit)
 
 
-SEtRe = re.compile( r"{(.*?)}", re.S )
+SEtRE = re.compile( r"{(.*?)}", re.S )
 
-RULeRe = re.compile( r"""
+RULeRE = re.compile( r"""
 (?P<param>[\w\-]+) # parameter
 (?P<sep>[\s:]+) # optional separator
 (?P<value>[^;\n]+) # value
 (?P<delim>[;\n]?) # delimeter
 """, re.S | re.M | re.X ) 
 
-VALUeRe = re.compile( r"(\S+\s*\(.*?\)|\S+)"  )
-UNItRe = re.compile( r"\b\d+([a-z])\b" )
+VALUeRE = re.compile( r"(\S+\s*\(.*?\)|\S+)"  )
+UNItRE = re.compile( r"\b\d+([a-z])\b" )
   
 def put_on_diet( cut ):
-  sets = SEtRe.finditer( str(cut) )
+  sets = SEtRE.finditer( str(cut) )
   abbmatch = [] # has to be ordered
   for s in sets:
 
-    rules = RULeRe.finditer( str(cut), s.start(1), s.end(1) )
+    rules = RULeRE.finditer( str(cut), s.start(1), s.end(1) )
     for rule in rules:
 
       if rule.group("param") in PROPERTyMNEMONICS:
@@ -579,14 +579,14 @@ def put_on_diet( cut ):
                            ":" ) )
 
 
-      values = VALUeRe.finditer( str(cut), rule.start("value"), rule.end("value") )
+      values = VALUeRE.finditer( str(cut), rule.start("value"), rule.end("value") )
       for val in values:
         if val.group(1) in VALUeMNEMONICS:
           abbmatch.append( ( val.start(1), 
                                val.end(1), 
                                VALUeMNEMONICS[ val.group(1) ] ) )
         else:
-          units = UNItRe.finditer( str(cut), val.start(1), val.end(1) )
+          units = UNItRE.finditer( str(cut), val.start(1), val.end(1) )
           for unit in units:
             if unit.group(1) in UNItMNEMONICS:
               abbmatch.append( ( unit.start(1), 
@@ -603,13 +603,13 @@ def put_on_diet( cut ):
   cut.sub_text( abbmatch )
 
 
-HEADErRe = re.compile( r"^//!(.*?)\n", re.S )
+HEADErRE = re.compile( r"^//!(.*?)\n", re.S )
 def extract_header( cut ):
   vendor=None
-  m = HEADErRe.search( str(cut) )
+  m = HEADErRE.search( str(cut) )
   if m:
     vendor = m.group(1)
-    cut.set(  HEADErRe.sub("", str(cut) )  )
+    cut.set(  HEADErRE.sub("", str(cut) )  )
   return vendor
 
 def add_header( cut ):
