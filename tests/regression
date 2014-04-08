@@ -14,6 +14,7 @@ test_defines1() { one2one defines1; }
 test_header1() { one2one header1; }
 test_arithmetics1() { one2one arythmetics1; }
 test_file_formats() { file_formats; }
+test_rgba() { one2one rgba1; }
 
 
 oneTimeSetUp()

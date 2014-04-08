@@ -78,6 +78,7 @@ syn match cssColor contained "\<transparent\>"
 syn match cssColor contained "\<white\>"
 syn match cssColor contained "#[0-9A-Fa-f]\{3\}\>"
 syn match cssColor contained "#[0-9A-Fa-f]\{6\}\>"
+syn match codColor contained "#[0-9A-Fa-f]\{8\}\>"
 "syn match cssColor contained "\<rgb\s*(\s*\d\+\(\.\d*\)\=%\=\s*,\s*\d\+\(\.\d*\)\=%\=\s*,\s*\d\+\(\.\d*\)\=%\=\s*)"
 syn region cssURL contained matchgroup=cssFunctionName start="\<url\s*(" end=")" oneline keepend
 syn region cssFunction contained matchgroup=cssFunctionName start="\<\(rgb\|clip\|attr\|counter\|rect\)\s*(" end=")" oneline keepend
@@ -185,7 +186,7 @@ syn keyword cssTableAttr contained fixed collapse separate show hide once always
 syn region cssInclude start="@import" end=";" contains=cssComment,codComment,cssURL,cssUnicodeEscape,cssMediaType
 syn match cssBraces contained "[{}]"
 syn match cssError contained "{@<>"
-syn region cssDefinition transparent matchgroup=cssBraces start='{' end='}' contains=css.*Attr,css.*Prop,cssComment,codComment,cssValue.*,cssColor,cssURL,cssImportant,cssError,cssStringQ,cssStringQQ,cssFunction,cssUnicodeEscape,codAllAttr,cod.*Prop
+syn region cssDefinition transparent matchgroup=cssBraces start='{' end='}' contains=css.*Attr,css.*Prop,cssComment,codComment,cssValue.*,cssColor,codColor,cssURL,cssImportant,cssError,cssStringQ,cssStringQQ,cssFunction,cssUnicodeEscape,codAllAttr,cod.*Prop
 syn match cssBraceError "}"
 
 syn match cssPseudoClass ":[A-Za-z0-9_-]*" contains=cssPseudoClassId,cssUnicodeEscape
@@ -261,6 +262,7 @@ if version >= 508 || !exists("did_css_syn_inits")
   HiLink cssURL String
   HiLink cssFunctionName Function
   HiLink cssColor Constant
+  HiLink codColor Constant
   HiLink cssIdentifier Function
   HiLink cssInclude Include
   HiLink cssImportant Special

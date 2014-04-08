@@ -1,0 +1,32 @@
+//!cofoh.com/css-on-diet-1.1
+
+
+@cod-defines {
+  COLOR1 #20e430ff
+  COLORa #20e430
+  COLOR2 COLORa12
+  COLOR3 COLORa_ARG1_
+
+}
+li {
+  bac #23f58600
+  bac #23f58601
+  bac #23f58602
+
+  bac #23f5867F
+  bac #23f58680
+  bac #23f58681
+
+  bac #23f586fd
+  bac #23f586fe
+  bac #23f586ff
+}
+
+ul {
+  bco #23f586
+  bco COLOR1
+  bco COLOR2
+  bco COLOR3(80)
+}
+
+
