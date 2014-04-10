@@ -4,7 +4,7 @@
 # Licensed under GPL-v3
 ##
 
-DIST=cod version LICENSE README.md
+DIST=cod version LICENSE README.md Changes
 VERSION=$(shell cat cod | grep -E '^VERSION *= *".*"' | grep -oE '[0-9\.]+')
 VERDIR=cod-$(VERSION)
 TARBALL=$(VERDIR).tgz
