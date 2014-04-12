@@ -10,5 +10,5 @@ Installation from TGZ file
 
 Unpack TGZ file and *cod* Python script is all you need. 
 
-Install Python if you don't have it.
+Install Python (ver 2.7.x preferable) if you don't have it.
 
