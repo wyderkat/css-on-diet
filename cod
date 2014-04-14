@@ -649,7 +649,7 @@ def add_header( cut ):
 
 
 def main( a ):
-  handleout = open(a.f, 'w') if a.f!="-" else sys.stdout
+  handleout = open(a.file, 'w') if a.file!="-" else sys.stdout
   for f in args.cod_files:
     fh = open(f, "U")
     content = fh.read()
@@ -665,8 +665,10 @@ def main( a ):
     #TODO where it should be
     expand_rgba( contentcut )
 
-    contentcut.recover_from_save() 
-    add_header( contentcut )
+    if not a.no_comments:
+      contentcut.recover_from_save() 
+    if not a.no_header:
+      add_header( contentcut )
 
     content = str(contentcut)
     if nlcharacter != None:
@@ -707,9 +709,17 @@ www.cofoh.com/css-on-diet""",
                       help='Css-on-diet file list to process')
 
   parser.add_argument(
-    '-f', metavar="output.css",
+    '-f', '--file', metavar="output.css",
     default="-",
     help='file to save result css. If not given or "-" string, print to STDOUT'
+  )
+  parser.add_argument(
+    '-c', '--no-comments',  action="store_true",
+    help='cut out all comments'
+  )
+  parser.add_argument(
+    '-d', '--no-header',  action="store_true",
+    help="don't add header line"
   )
   # FINISH
   args = parser.parse_args()
