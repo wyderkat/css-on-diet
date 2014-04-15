@@ -1,5 +1,7 @@
 v1.1  
 
+  * CSS Minifier (--minify-css)
+   
   * Fix strings exceptions for: comments, declarations, blocks
 
   * Hexadecimal RGBA colors

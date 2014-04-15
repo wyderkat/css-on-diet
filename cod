@@ -695,26 +695,23 @@ def add_header( cut ):
 
 
 MINIFySPACEsRE = re.compile( r"""
-  # quotes
-  (
-    "(?:[^"\\]+|\\.)*"
-  | '(?:[^'\\]+|\\.)*'
-  )
+  %s           # whole string 
 |
   # ; before } (and the spaces after it while we're here)
   \s* ; \s* ( } ) \s*
-#|
-#  # all spaces around meta chars/operators
-#  \s* ( [*$~^|]?= | [{};,>~+-] | !important\b ) \s*
-#|
-#  # spaces right of ( [ :
-#  ( [[(:] ) \s+
-#|
-#  # spaces left of ) ]
-#  \s+ ( [\])] )
-#|
-#  # spaces left (and right) of :
-#  \s+ ( : ) \s*
+|
+  # all spaces around meta chars/operators
+  \s* ( [*$~^|]?= | [{};,>~+-] | !important\b ) \s*
+|
+  # spaces right of ( [ :
+  ( [[(:] ) \s+
+|
+  # spaces left of ) ]
+  \s+ ( [\])] )
+|
+  # spaces left (and right) of :
+  \s+ ( : ) \s*
+   # TODO this is CPU killer
 #  # but not in selectors: not followed by a {
 #  (?!
 #    (?:
@@ -724,17 +721,25 @@ MINIFySPACEsRE = re.compile( r"""
 #    )*
 #    {
 #  )
-#|
-#  # spaces at beginning/end of string
-#  ^ \s+ | \s+ \Z
-#|
-#  # double spaces to single
-#  (\s)\s+
-""", re.X|re.S|re.I)
+|
+  # spaces at beginning/end of string
+  ^ \s+ | \s+ \Z
+|
+  # double spaces to single
+  (\s)\s+
+""" % STRINgSUBRE, re.X|re.S|re.I)
 
 def minify_spaces( css ):
-  return MINIFySPACEsRE.sub( r"\1", css )
+  return MINIFySPACEsRE.sub( replace_spaces, css )
 
+def replace_spaces( m ):
+  """ this functions is workaround for python sre exception "unmatched groups"
+  """
+  out = ""
+  for g in m.groups():
+    if g:
+      out += g
+  return out
 
 def get_nlcharacter( hdl ):
   nl = None
