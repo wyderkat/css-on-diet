@@ -334,8 +334,12 @@ class a_cut( object ):
 
 
 COMMENTsRE = re.compile( r"""
-                        //   |
+                        \\"  |  # should it be before quotes ? probably
+                        \\'  |
+                        "    |
+                        '    |
                         \n   |
+                        //   |
                         /\*  |
                         \*/  
                         """, re.X ) 
@@ -344,6 +348,8 @@ def rm_comments( cut ):
   nocomment = 0 # no inside comment
   c = 1 # c-like comments, but nested
   cpp = 2 # c++like comments
+  doublequote = 3 # strings " \" "
+  singlequote = 4 # strings ' \' '
 
   mode = nocomment
   clevel = 0 # nesting level of c-like comments
@@ -355,20 +361,32 @@ def rm_comments( cut ):
   start = 0
   for i in matches:
     m = i.group()
-    if mode == cpp:
+    #**  PROCESS modes
+    if mode == doublequote:
+      if m == '"':
+        mode = nocomment
+    elif mode == singlequote:
+      if m == "'":
+        mode = nocomment
+    elif mode == cpp:
       if m == "\n":
         matchesidx.append( ( start, i.end()-1 ) ) # -1 because without \n
         mode = nocomment
     elif mode == c:
       if m == "/*":
         clevel += 1
-      if m == "*/":
+      elif m == "*/":
         clevel -= 1
       if clevel == 0:
         matchesidx.append( ( start, i.end() ) )
         mode = nocomment
+    #**  INIT modes
     else:
-      if m == "//":
+      if m == '"':
+        mode = doublequote
+      elif m == "'":
+        mode = singlequote
+      elif m == "//":
         start = i.start()
         mode = cpp
       elif m == "/*":
@@ -648,6 +666,63 @@ def add_header( cut ):
   cut.set_str( header + str(cut) )
 
 
+MINIFySPACEsRE = re.compile( r"""
+  # quotes
+  (
+    "(?:[^"\\]+|\\.)*"
+  | '(?:[^'\\]+|\\.)*'
+  )
+|
+  # ; before } (and the spaces after it while we're here)
+  \s* ; \s* ( } ) \s*
+#|
+#  # all spaces around meta chars/operators
+#  \s* ( [*$~^|]?= | [{};,>~+-] | !important\b ) \s*
+#|
+#  # spaces right of ( [ :
+#  ( [[(:] ) \s+
+#|
+#  # spaces left of ) ]
+#  \s+ ( [\])] )
+#|
+#  # spaces left (and right) of :
+#  \s+ ( : ) \s*
+#  # but not in selectors: not followed by a {
+#  (?!
+#    (?:
+#      [^{}"']+
+#    | "(?:[^"\\]+|\\.)*"
+#    | '(?:[^'\\]+|\\.)*' 
+#    )*
+#    {
+#  )
+#|
+#  # spaces at beginning/end of string
+#  ^ \s+ | \s+ \Z
+#|
+#  # double spaces to single
+#  (\s)\s+
+""", re.X|re.S|re.I)
+
+def minify_spaces( css ):
+  return MINIFySPACEsRE.sub( r"\1", css )
+
+
+def get_nlcharacter( hdl ):
+  nl = None
+  if type(hdl.newlines) == type(""):
+    nl = hdl.newlines
+  elif type(hdl.newlines) == type(()):
+    if "\r\n" in hdl.newlines:
+      nl = "\r\n" # priority for dos
+    elif "\n" in hdl.newlines:
+      nl = "\n" # than unix
+    else:
+      nl = hdl.newlines[0] # should be mac and never reach here
+  return nl
+
+
+
 def main( a ):
   handleout = open(a.file, 'w') if a.file!="-" else sys.stdout
   for f in args.cod_files:
@@ -671,27 +746,16 @@ def main( a ):
       add_header( contentcut )
 
     content = str(contentcut)
+
+    if a.minify_css:
+      content = minify_spaces( content )
+
     if nlcharacter != None:
       content = content.replace("\n", nlcharacter )
 
     handleout.write( content )
     if handleout is not sys.stdout:
       handleout.close()
-
-def get_nlcharacter( hdl ):
-  nl = None
-  if type(hdl.newlines) == type(""):
-    nl = hdl.newlines
-  elif type(hdl.newlines) == type(()):
-    if "\r\n" in hdl.newlines:
-      nl = "\r\n" # priority for dos
-    elif "\n" in hdl.newlines:
-      nl = "\n" # than unix
-    else:
-      nl = hdl.newlines[0] # should be mac and never reach here
-  return nl
-
-
 
 if __name__ == "__main__":
 
@@ -721,7 +785,15 @@ www.cofoh.com/css-on-diet""",
     '-d', '--no-header',  action="store_true",
     help="don't add header line"
   )
+  parser.add_argument(
+    '-m', '--minify-css',  action="store_true",
+    help="Minify CSS result code. Implies --no-comments and --no-header"
+  )
   # FINISH
   args = parser.parse_args()
+  if args.minify_css:
+    # because we don't operate on CUT object - TODO
+    args.no_comments = True
+    args.no_header = True
 
   main( args )

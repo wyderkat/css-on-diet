@@ -10,3 +10,8 @@ li {
   po/*hola /*manola*/ */s ab; b-- black 10 
   */
 }
+
+img {
+  ba- url("file /* komment */")
+  ba- url("http://this.is.not.one.line.comment")
+}
