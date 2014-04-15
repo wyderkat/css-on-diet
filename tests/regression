@@ -15,6 +15,7 @@ test_header1() { one2one header1; }
 test_arithmetics1() { one2one arythmetics1; }
 test_file_formats() { file_formats; }
 test_rgba() { one2one rgba1; }
+test_consume_strings() { one2one strings1; }
 
 
 oneTimeSetUp()

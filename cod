@@ -599,12 +599,24 @@ def convert_rgba_hex_to_str( color ):
 
 SEtRE = re.compile( r"{(.*?)}", re.S )
 
+STRINgSUBRE = r"""
+  (?P<string>
+    "(?:[^"\\]+|\\.)*"
+  | '(?:[^'\\]+|\\.)*'
+  )
+"""
+
 RULeRE = re.compile( r"""
 (?P<param>[\w\-]+) # parameter
 (?P<sep>[\s:]+) # optional separator
-(?P<value>[^;\n]+) # value
+(?P<value>
+  (?:
+    %s | # whole string or 
+    [^;\n] # any character outside whole string
+  )+
+) # value
 (?P<delim>[;\n]?) # delimeter
-""", re.S | re.M | re.X ) 
+""" % STRINgSUBRE, re.S | re.X ) 
 
 VALUeRE = re.compile( r"(\S+\s*\(.*?\)|\S+)"  )
 UNItRE = re.compile( r"\b\d+([a-z])\b" )
