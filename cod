@@ -396,6 +396,7 @@ def rm_comments( cut ):
     
   cut.cut_and_save( matchesidx )
 
+# TODO string support
 DEFINEsBLOCkRE = re.compile( r"""
   @cod-defines
   \s*
@@ -403,7 +404,9 @@ DEFINEsBLOCkRE = re.compile( r"""
   (.*?) # everything up to close
   }
                             """, re.X|re.S ) 
+
 DEFINeNAMeCHAR = r"[-\w]"
+# TODO string support
 DEFINEsRE = re.compile( r"""
   (?P<name>%s+)   # some freedom in naming
   [ \t\r\f\v]*       # not \n! can be empty when no body
@@ -449,6 +452,7 @@ def read_defines( cut ):
       defines.add_def( name, body )
   return defines
 
+# TODO strings support
 DEFINeARGUMENT = re.compile( r"_ARG(\d+)_" )
 
 def expand_defines( defines, cutorstr ):
@@ -494,6 +498,7 @@ def expand_argument( arguments, matchobject ):
     # TODO log
     return ""
 
+# string support
 ARITHMETIcRE = re.compile( r"""
     \s          # has to be sourrounded by white characters
     (           # main body - no white spaces
@@ -565,6 +570,7 @@ def get_arithmetic_units( a ):
   a = ARITHMETIcUNITsRE.sub( "", a )
   return (a, unit)
 
+# TODO string support - but maybe really not needed
 RGBaRE = re.compile( r"""
     \W          # cannot be \b because of \#
     (           # 
@@ -597,14 +603,23 @@ def convert_rgba_hex_to_str( color ):
 
     
 
-SEtRE = re.compile( r"{(.*?)}", re.S )
-
 STRINgSUBRE = r"""
   (?P<string>
     "(?:[^"\\]+|\\.)*"
   | '(?:[^'\\]+|\\.)*'
   )
 """
+
+SEtRE = re.compile( r"""
+{
+  (  # main body
+    (?:
+      %s | # whole string or
+      . # any character outside whole string
+    )*?
+  )
+}
+""" % STRINgSUBRE, re.S | re.X ) 
 
 RULeRE = re.compile( r"""
 (?P<param>[\w\-]+) # parameter
@@ -618,6 +633,7 @@ RULeRE = re.compile( r"""
 (?P<delim>[;\n]?) # delimeter
 """ % STRINgSUBRE, re.S | re.X ) 
 
+# TODO string support, better parentheses
 VALUeRE = re.compile( r"(\S+\s*\(.*?\)|\S+)"  )
 UNItRE = re.compile( r"\b\d+([a-z])\b" )
   

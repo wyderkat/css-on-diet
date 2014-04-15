@@ -4,3 +4,8 @@ img {
   margin: "10px; pa- 20px";
   background: url("ht;tp://this.is.not.one.line.comment");
 }
+
+li {
+  background: url(" closing  }");
+  margin: 1px;
+}

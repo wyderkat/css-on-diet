@@ -3,3 +3,8 @@ img {
   ma- "10px; pa- 20px"
   ba- url("ht;tp://this.is.not.one.line.comment")
 }
+
+li {
+  ba- url(" closing  }");
+  ma- 1p
+}
