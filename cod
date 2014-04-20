@@ -204,6 +204,7 @@ import argparse
 import re
 import sys
 from os import path
+from pdb import set_trace as trace
 
 APpDIR = path.dirname( path.realpath(__file__) )
 
@@ -258,6 +259,66 @@ class a_cut( object ):
       me.str = me.str[ : counter ] + data + me.str[ counter : ]
       counter += len(data)
     me.cutregister = []
+
+  def merge_another( me, anothersdata ):
+    if anothersdata:
+      anothersdata1 = []
+      for another,position in anothersdata:
+        # find cutregister index to add before it
+        idx = 0
+        delta = 0 # distance between cutregister position and last cut
+        absolutregpos = 0 # absolute register position, because register keeps only relative 
+        for cut in me.cutregister:
+          absolutregpos += cut[0]
+          if absolutregpos >= position:
+            delta = cut[0] - ( absolutregpos - position )
+            break
+          idx += 1 # previous index because of "break"
+        anothersdata1.append( (another,position,idx,delta) )
+        print ">>> position = %d idx = %d delta = %d" % (position, idx, delta)
+
+      #import vimpdb; vimpdb.set_trace()
+      # join registers
+      for another,position,idx,delta in anothersdata1:
+        # update both cutregisters
+        if another.cutregister: # not empty
+          another.cutregister[0] = ( another.cutregister[0][0] + delta, 
+                                     another.cutregister[0][1] )
+
+        try:
+          remainingdelta = another.characters_after_last_cut()
+          me.cutregister[idx] = ( me.cutregister[idx][0] + remainingdelta,
+                                  me.cutregister[idx][1] )
+        except IndexError:
+          pass # empty cutregister or index bigger than no of elements
+
+      lastidx = 0
+      lastpos = 0
+      newcutregister = []
+      newstr = ""
+      for another,position,idx,delta in anothersdata1:
+        newcutregister += me.cutregister[lastidx:idx] + another.cutregister
+        lastidx = idx
+
+        newstr += me.str[lastpos:position] + another.str 
+        lastpos = position
+
+        if me.oryg == None:
+          me.oryg = another.oryg
+      # close new list
+      newcutregister += me.cutregister[lastidx:]
+      newstr += me.str[lastpos:]
+
+      me.cutregister = newcutregister
+      me.str = newstr
+
+  def characters_after_last_cut( me ):
+    absolutregpos = 0 # absolute register position, because register keeps only relative 
+    for cut in me.cutregister:
+      absolutregpos += cut[0]
+    return len(me.str) - absolutregpos
+
+    
 
   def replace_preserving( me, indexeswithdata ):
     """
@@ -741,6 +802,41 @@ def replace_spaces( m ):
       out += g
   return out
 
+# TODO string support
+INCLUDEsBLOCkRE = re.compile( r"""
+  @cod-includes
+  \s*
+  {
+  (.*?) # everything up to close
+  }
+""", re.X|re.S ) 
+# TODO string support
+INCLUDEdFILeRE = re.compile( r"""
+  \s*
+  (["']?)
+  (?P<file>.+?)
+  \1
+  \s*
+  $
+""", re.X|re.M ) 
+
+def find_includes( cut ):
+  result = []
+  blocks = INCLUDEsBLOCkRE.finditer( str(cut) )
+  to_replace = []
+  delta = 0
+  for b in blocks:
+    includesblock = b.group(1)
+    to_replace.append( ( b.start(), b.end(), "" ) )
+
+    includedfiles = INCLUDEdFILeRE.finditer( includesblock )
+    for i in includedfiles:
+      filename = i.group("file") 
+      result.append( (filename, b.start() + delta ) )
+    delta += b.start() - b.end()
+  cut.replace_preserving( to_replace )
+  return result
+
 def get_nlcharacter( hdl ):
   nl = None
   if type(hdl.newlines) == type(""):
@@ -755,40 +851,58 @@ def get_nlcharacter( hdl ):
   return nl
 
 
-
-def main( a ):
+def do_main( a ):
   handleout = open(a.file, 'w') if a.file!="-" else sys.stdout
-  for f in args.cod_files:
-    fh = open(f, "U")
-    content = fh.read()
-    nlcharacter = get_nlcharacter( fh )
-    fh.close()
-    contentcut= a_cut( content )
-    extract_header( contentcut )
-    rm_comments( contentcut )
-    definesdict = read_defines( contentcut )
-    expand_defines( definesdict, contentcut )
-    reduce_arithmetic( contentcut )
-    put_on_diet( contentcut )
-    #TODO where it should be
-    expand_rgba( contentcut )
 
-    if not a.no_comments:
-      contentcut.recover_from_save() 
-    if not a.no_header:
-      add_header( contentcut )
+  contentcut = a_cut( "" ) # empty because it is meta cod file for cmd line args
+  tomerge = []
+  for filename in args.cod_files:
+    incontentcut, nlcharacter = include_files_recursiv ( filename )
+    tomerge.append( ( incontentcut, 0 ) ) # 0 means at the end because contentcut is empty
+  contentcut.merge_another( tomerge )
 
-    content = str(contentcut)
+  definesdict = read_defines( contentcut )
+  expand_defines( definesdict, contentcut )
+  reduce_arithmetic( contentcut )
+  put_on_diet( contentcut )
+  #TODO where it should be
+  expand_rgba( contentcut )
 
-    if a.minify_css:
-      content = minify_spaces( content )
+  if not a.no_comments:
+    contentcut.recover_from_save() 
+  if not a.no_header:
+    add_header( contentcut )
 
-    if nlcharacter != None:
-      content = content.replace("\n", nlcharacter )
+  content = str(contentcut)
 
-    handleout.write( content )
-    if handleout is not sys.stdout:
-      handleout.close()
+  if a.minify_css:
+    content = minify_spaces( content )
+
+  if nlcharacter != None:
+    content = content.replace("\n", nlcharacter )
+
+  handleout.write( content )
+  if handleout is not sys.stdout:
+    handleout.close()
+
+def include_files_recursiv( filename ):
+  fh = open(filename, "U")
+  dir = path.dirname( path.realpath( filename ) )
+  content = fh.read()
+  # TODO sha1
+  nlcharacter = get_nlcharacter( fh ) # TODO
+  fh.close()
+  contentcut= a_cut( content )
+  extract_header( contentcut )
+  rm_comments( contentcut )
+  tomerge = []
+  for infile, position in find_includes( contentcut ):
+    print ">>> infile=%s at position=%d in %s" % ( infile, position, filename )
+    infile = path.join( dir, infile )
+    (incontentcut, innlcharacter) = include_files_recursiv ( infile )
+    tomerge.append( (incontentcut, position) )
+  contentcut.merge_another( tomerge )
+  return (contentcut, nlcharacter)
 
 if __name__ == "__main__":
 
@@ -829,4 +943,4 @@ www.cofoh.com/css-on-diet""",
     args.no_comments = True
     args.no_header = True
 
-  main( args )
+  do_main( args )
