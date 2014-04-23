@@ -260,137 +260,132 @@ class a_cut( object ):
       counter += len(data)
     me.cutregister = []
 
-  def merge_another( me, anothersdata ):
-    if anothersdata:
-      anothersdata1 = []
-      for another,position in anothersdata:
-        # find cutregister index to add before it
-        idx = 0
-        delta = 0 # distance between cutregister position and last cut
-        absolutregpos = 0 # absolute register position, because register keeps only relative 
-        for cut in me.cutregister:
-          absolutregpos += cut[0]
-          if absolutregpos >= position:
-            delta = cut[0] - ( absolutregpos - position )
-            break
-          idx += 1 # previous index because of "break"
-        anothersdata1.append( (another,position,idx,delta) )
-        print ">>> position = %d idx = %d delta = %d" % (position, idx, delta)
-
-      #import vimpdb; vimpdb.set_trace()
-      # join registers
-      for another,position,idx,delta in anothersdata1:
-        # update both cutregisters
-        if another.cutregister: # not empty
-          another.cutregister[0] = ( another.cutregister[0][0] + delta, 
-                                     another.cutregister[0][1] )
-
-        try:
-          remainingdelta = another.characters_after_last_cut()
-          me.cutregister[idx] = ( me.cutregister[idx][0] + remainingdelta,
-                                  me.cutregister[idx][1] )
-        except IndexError:
-          pass # empty cutregister or index bigger than no of elements
-
-      lastidx = 0
-      lastpos = 0
-      newcutregister = []
-      newstr = ""
-      for another,position,idx,delta in anothersdata1:
-        newcutregister += me.cutregister[lastidx:idx] + another.cutregister
-        lastidx = idx
-
-        newstr += me.str[lastpos:position] + another.str 
-        lastpos = position
-
-        if me.oryg == None:
-          me.oryg = another.oryg
-      # close new list
-      newcutregister += me.cutregister[lastidx:]
-      newstr += me.str[lastpos:]
-
-      me.cutregister = newcutregister
-      me.str = newstr
-
-  def characters_after_last_cut( me ):
+  def last_cut_dinstances( me ):
+    """ get ( characters after last cut, and last cut absolute position ) """
     absolutregpos = 0 # absolute register position, because register keeps only relative 
     for cut in me.cutregister:
       absolutregpos += cut[0]
-    return len(me.str) - absolutregpos
+    return ( len(me.str) - absolutregpos, absolutregpos )
 
     
-
-  def replace_preserving( me, indexeswithdata ):
+  def replace_preserving( me, indexeswithdata, merge = False ):
     """
-    for start,end,repl in indexeswithdata:
-      substitute text start-end by repl
-      update cut register for new positions !
+    For start,end,stringorcut in indexeswithdata:
+      substitute start:end by stringorcut
+    Update cut register for new positions !
+    If merge == True, merge cutregisters from string_or_cut (has to be cut)
     """
+    if indexeswithdata:
+      newstr = "" # substituted string, concatenated by iteration
+      laststridx = 0 # pos of last character in string
+      newcutreg = [] # updated cut register, constructed by iteration
+      lastregidx = 0 # pos of last visited record in register
+      absolutregpos = 0 # absolute register position, because register keeps only relative 
+      # position from last record. 
 
-    newstr = "" # substituted string, concatenated by iteration
-    laststridx = 0 # pos of last character in string
-    newcutreg = [] # updated cut register, constructed by iteration
-    lastregidx = 0 # pos of last visited record in register
-    absolutregpos = 0 # absolute register position, because register keeps only relative 
-    # position from last record. 
+      # following loop assumes indexeswithdata and cutregister are sorted!
+      again = False # flag for visiting register record more than once 
+      for start,end,stringorcut in indexeswithdata:
+        # SUBSTITUTE
+        newstr += me.str[ laststridx : start ] + str(stringorcut)
+        laststridx = end # for next substitude iteration
+        merged = False
 
-    # following loop assumes indexeswithdata and cutregister are sorted!
-    again = False # flag for visiting register record more than once 
-    for start,end,data in indexeswithdata:
-      # SUBSTITUTE
-      newstr += me.str[ laststridx : start ] + data
-      laststridx = end # for next substitude iteration
-
-      # starting from lastregidx up to place where "cut" is found
-      # and break then!
-      for i in xrange( lastregidx, len(me.cutregister) ):
-        if not again:
-          absolutregpos += me.cutregister[i][0]
-        # condition to check if cut should be updated
-        # it works because als cuts before are skipped in the 
-        # "else" statement below
-        if absolutregpos > start:
-          #how much substitute changed text
-          delta = len(data) - (end-start) 
+        # starting from lastregidx up to place where "cut" is found
+        # and break then!
+        for cut in me.cutregister[lastregidx:]:
           if not again:
-            # update register from oryginal
-            newcutreg.append(  ( me.cutregister[i][0] + delta, me.cutregister[i][1] )  )
-            again = True
+            absolutregpos += cut[0]
+          # condition to check if cut should be updated
+          # it works because als cuts before are skipped in the 
+          # "else" statement below
+          if absolutregpos > start:
+            #how much substitute changed text
+            delta = len(str(stringorcut)) - (end-start) 
+            if not again:
+              # update register from oryginal
+              newcutreg.append(  ( cut[0] + delta, cut[1] )  )
+              again = True
+            else:
+              #update register alredy updated
+              newcutreg[-1] = ( newcutreg[-1][0] + delta, newcutreg[-1][1] )
+            if merge:
+              ( merged, newcutreg ) = me.merge_cutregister_when_replace(
+                stringorcut,
+                newcutreg,
+                newstr)
+            break
           else:
-            #update register alredy updated
-            newcutreg[i] = ( newcutreg[i][0] + delta, newcutreg[i][1] )
-          break
-        else:
-          if not again:
-            # copy record without updating. not needed
-            newcutreg.append( me.cutregister[i] ) 
-          lastregidx += 1 # skip this record next iteration
-          again = False
+            if not again:
+              # copy record without updating. not needed
+              newcutreg.append( cut ) 
+            lastregidx += 1 # skip this record next iteration
+            again = False
 
-    # copy rest of the string
-    newstr += me.str[ laststridx : ]
-    # copy rest of register
-    againfix = 1 if again else 0
-    for i in xrange( lastregidx + againfix, len(me.cutregister) ):
-      newcutreg.append( me.cutregister[i] )
-    
-    # save str and register
-    # We need to do it at the end because all indexes are from oryginal string
-    me.str = newstr
-    #
-    me.cutregister = []
-    fixnext = 0 # fix next pos which is relative to previous 
-    for pos,data in newcutreg:
-      pos += fixnext
-      fixnext = 0
-      if pos < 0: # negative registers
-        # remove them
-        pass
-        # uncomment if we want to preserve negative comments
-        #me.cutregister.append( (0, data) )
-        fixnext = pos
+        # do merging if not before other registters - appending
+        if merge and not merged:
+          ( merged, newcutreg ) = me.merge_cutregister_when_replace(
+            stringorcut,
+            newcutreg,
+            newstr,
+            tail = True) 
+
+      # copy rest of the string
+      newstr += me.str[ laststridx : ]
+      # copy rest of register
+      againfix = 1 if again else 0
+      for i in xrange( lastregidx + againfix, len(me.cutregister) ):
+        newcutreg.append( me.cutregister[i] )
+      
+      # save str and register
+      # We need to do it at the end because all indexes are from oryginal string
+      me.str = newstr
+      #
+      me.cutregister = []
+      # TODO this should be changed to removing deleted comments. 
+      fixnext = 0 # fix next pos which is relative to previous 
+      for pos,data in newcutreg:
+        pos += fixnext
+        fixnext = 0
+        if pos < 0: # negative registers
+          # remove them
+          pass
+          # uncomment if we want to preserve negative comments
+          #me.cutregister.append( (0, data) )
+          fixnext = pos
+        else:
+          me.cutregister.append( (pos, data) )
+
+  def merge_cutregister_when_replace(
+        me,
+        stringorcut,
+        newcutreg,
+        newstr,
+        tail = False 
+    ):
+    result = False
+    if stringorcut != []:
+
+      (mergefilling, mergeabsolute) =  stringorcut.last_cut_dinstances()
+      # TODO can be on fly
+      a = 0 
+      for cut in newcutreg[:-1]: # the last included cut is before -1
+        a += cut[0]
+      oldfilling = len(newstr) - len(str(stringorcut)) - a # len() - len() means previous text
+      mergecut = stringorcut.cutregister
+
+      if mergecut:
+        mergecut[0] = ( mergecut[0][0] + oldfilling, mergecut[0][1] )
+      
+      # one before end because it is already attached
+      if not tail:
+        newcutreg = newcutreg[:-1] + mergecut + \
+          [ ( newcutreg[-1][0] - oldfilling - mergeabsolute, newcutreg[-1][1] ) ]
       else:
-        me.cutregister.append( (pos, data) )
+        newcutreg += mergecut
+      
+      result = True
+    return ( result, newcutreg )
 
 
 
@@ -858,8 +853,8 @@ def do_main( a ):
   tomerge = []
   for filename in args.cod_files:
     incontentcut, nlcharacter = include_files_recursiv ( filename )
-    tomerge.append( ( incontentcut, 0 ) ) # 0 means at the end because contentcut is empty
-  contentcut.merge_another( tomerge )
+    tomerge.append( ( 0, 0, incontentcut ) ) # 0 means at the end because contentcut is empty
+  contentcut.replace_preserving( tomerge, merge = True )
 
   definesdict = read_defines( contentcut )
   expand_defines( definesdict, contentcut )
@@ -897,11 +892,11 @@ def include_files_recursiv( filename ):
   rm_comments( contentcut )
   tomerge = []
   for infile, position in find_includes( contentcut ):
-    print ">>> infile=%s at position=%d in %s" % ( infile, position, filename )
+    #print ">>> infile=%s at position=%d in %s" % ( infile, position, filename )
     infile = path.join( dir, infile )
     (incontentcut, innlcharacter) = include_files_recursiv ( infile )
-    tomerge.append( (incontentcut, position) )
-  contentcut.merge_another( tomerge )
+    tomerge.append( (position,position,incontentcut) )
+  contentcut.replace_preserving( tomerge, merge=True )
   return (contentcut, nlcharacter)
 
 if __name__ == "__main__":
