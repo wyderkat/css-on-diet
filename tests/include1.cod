@@ -1,0 +1,9 @@
+// < 1
+@cod-includes {
+  "include1a.cod"
+  "include1c.cod" // should be included already
+}
+li {
+  mar 10p
+}
+// > 1

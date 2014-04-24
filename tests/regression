@@ -16,6 +16,7 @@ test_arithmetics1() { one2one arythmetics1; }
 test_file_formats() { file_formats; }
 test_rgba() { one2one rgba1; }
 test_consume_strings() { one2one strings1; }
+test_include() { include1; }
 
 
 oneTimeSetUp()
@@ -40,6 +41,14 @@ application_start()
   assertTrue "Cannot start cod executable" "$COD -h"
 }
 
+assert_except_1st_line()
+# $1 - file 1
+# $2 - file2
+{
+  assertTrue "wrong result file" \
+    "cmp <(tail -n +2 $1) <(tail -n +2 $2)" # start from 2nd line
+}
+
 switches()
 {
   in=file.cod
@@ -49,8 +58,7 @@ switches()
   $COD $in -f $out
   assertSame "execution error" 0 $?
 
-  assertTrue "wrong result file" \
-    "cmp <(tail -n +2 $expected) <(tail -n +2 $out)" # start from 2nd line
+  assert_except_1st_line $expected $out
 }
 
 one2one()
@@ -63,8 +71,7 @@ one2one()
 
   assertSame "execution error" 0 $?
 
-  assertTrue "wrong result file" \
-    "cmp <(tail -n +2 $expected) <(tail -n +2 $out)" # start from 2nd line
+  assert_except_1st_line $expected $out
 }
 
 file_formats()
@@ -75,6 +82,18 @@ file_formats()
   one2one ffmix
 }
 
+include1()
+{
+  in="include1.cod include1Z.cod"
+  out=include1.result.css
+  expected=include1.css
+
+  $COD $in > $out
+
+  assertSame "execution error" 0 $?
+
+  assert_except_1st_line $expected $out
+}
 
 
 

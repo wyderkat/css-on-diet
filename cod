@@ -4,8 +4,8 @@
 #  www.cofoh.com
 # Licensed under GPL-v3
 ##
-VERSION = "1.1"
-PROToVERSION = "1.1"
+VERSION = "1.2"
+PROToVERSION = "1.2"
 
 PROPERTyMNEMONICS = {
   "col":"color",
@@ -204,7 +204,7 @@ import argparse
 import re
 import sys
 from os import path
-from pdb import set_trace as trace
+import hashlib
 
 APpDIR = path.dirname( path.realpath(__file__) )
 
@@ -368,8 +368,13 @@ class a_cut( object ):
 
       (mergefilling, mergeabsolute) =  stringorcut.last_cut_dinstances()
       # TODO can be on fly
+      if tail:
+        lastindex = None
+      else:
+        lastindex = -1
+
       a = 0 
-      for cut in newcutreg[:-1]: # the last included cut is before -1
+      for cut in newcutreg[:lastindex]: # the last included cut is before -1
         a += cut[0]
       oldfilling = len(newstr) - len(str(stringorcut)) - a # len() - len() means previous text
       mergecut = stringorcut.cutregister
@@ -377,7 +382,6 @@ class a_cut( object ):
       if mergecut:
         mergecut[0] = ( mergecut[0][0] + oldfilling, mergecut[0][1] )
       
-      # one before end because it is already attached
       if not tail:
         newcutreg = newcutreg[:-1] + mergecut + \
           [ ( newcutreg[-1][0] - oldfilling - mergeabsolute, newcutreg[-1][1] ) ]
@@ -837,12 +841,18 @@ def get_nlcharacter( hdl ):
   if type(hdl.newlines) == type(""):
     nl = hdl.newlines
   elif type(hdl.newlines) == type(()):
-    if "\r\n" in hdl.newlines:
-      nl = "\r\n" # priority for dos
-    elif "\n" in hdl.newlines:
-      nl = "\n" # than unix
-    else:
-      nl = hdl.newlines[0] # should be mac and never reach here
+    nl = choose_nlcharacter( hdl.newlines )
+  return nl
+
+def choose_nlcharacter( newlines ):
+  if "\r\n" in newlines:
+    nl = "\r\n" # priority for dos
+  elif "\n" in newlines:
+    nl = "\n" # than unix
+  elif "\r" in newlines:
+    nl = "\r" # than mac
+  else: # None
+    nl = "\n" # unix by default
   return nl
 
 
@@ -851,10 +861,16 @@ def do_main( a ):
 
   contentcut = a_cut( "" ) # empty because it is meta cod file for cmd line args
   tomerge = []
+  included_sha1 = []
+  nlcharacterlist = [ ]
   for filename in args.cod_files:
-    incontentcut, nlcharacter = include_files_recursiv ( filename )
+    incontentcut, innlcharacter = include_files_recursiv ( filename, included_sha1 )
+    if incontentcut == None:
+      continue
+    nlcharacterlist.append( innlcharacter )
     tomerge.append( ( 0, 0, incontentcut ) ) # 0 means at the end because contentcut is empty
   contentcut.replace_preserving( tomerge, merge = True )
+  nlcharacter = choose_nlcharacter( nlcharacterlist )
 
   definesdict = read_defines( contentcut )
   expand_defines( definesdict, contentcut )
@@ -880,13 +896,21 @@ def do_main( a ):
   if handleout is not sys.stdout:
     handleout.close()
 
-def include_files_recursiv( filename ):
+def include_files_recursiv( filename, included_sha1 ):
   fh = open(filename, "U")
   dir = path.dirname( path.realpath( filename ) )
   content = fh.read()
   # TODO sha1
-  nlcharacter = get_nlcharacter( fh ) # TODO
+  nlcharacterlist = [ get_nlcharacter( fh ) ]
   fh.close()
+  sha1 = hashlib.sha1()
+  sha1.update( content )
+  sha1 = sha1.digest()
+  if sha1 in included_sha1:
+    # TODO log 
+    return ( None, None )
+  else:
+    included_sha1.append( sha1 )
   contentcut= a_cut( content )
   extract_header( contentcut )
   rm_comments( contentcut )
@@ -894,9 +918,13 @@ def include_files_recursiv( filename ):
   for infile, position in find_includes( contentcut ):
     #print ">>> infile=%s at position=%d in %s" % ( infile, position, filename )
     infile = path.join( dir, infile )
-    (incontentcut, innlcharacter) = include_files_recursiv ( infile )
+    (incontentcut, innlcharacter) = include_files_recursiv ( infile, included_sha1 )
+    if incontentcut == None:
+      continue
+    nlcharacterlist.append( innlcharacter )
     tomerge.append( (position,position,incontentcut) )
   contentcut.replace_preserving( tomerge, merge=True )
+  nlcharacter = choose_nlcharacter( nlcharacterlist )
   return (contentcut, nlcharacter)
 
 if __name__ == "__main__":
