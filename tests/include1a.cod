@@ -3,5 +3,5 @@
   ma- 3p
 }
 @cod-includes { include1b.cod }
-@cod-includes { include1c.cod }
+@cod-include { include1c.cod }
 // > 1a

@@ -458,7 +458,7 @@ def rm_comments( cut ):
 
 # TODO string support
 DEFINEsBLOCkRE = re.compile( r"""
-  @cod-defines
+  @cod-defines?
   \s*
   {
   (.*?) # everything up to close
@@ -805,7 +805,7 @@ def replace_spaces( m ):
 
 # TODO string support
 INCLUDEsBLOCkRE = re.compile( r"""
-  @cod-includes
+  @cod-includes?
   \s*
   {
   (.*?) # everything up to close

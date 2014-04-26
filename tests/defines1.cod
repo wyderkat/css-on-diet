@@ -5,10 +5,14 @@
   MACROGOT GOT(14,12)
 }
 
+@cod-define {
+  SINGULAR #FF0000
+}
 // before
 li {
   ma- MAR/*  */
   mal CAR 
   pa- GOT(ola , pies  kot ) /* dwa */
   mar MACROGOT
+  bac SINGULAR
 }
