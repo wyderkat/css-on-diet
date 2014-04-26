@@ -1,0 +1,12 @@
+@cod-defines {
+  OLA 10p
+}
+@cod-includes {
+  "multipledefinesA.cod"
+}
+@cod-defines {
+  KOTA MA+3
+}
+li {
+  mar KOTA
+}
