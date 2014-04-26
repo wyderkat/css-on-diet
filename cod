@@ -496,11 +496,12 @@ class a_defines(object):
       return me.dictin.values()
 
 def read_defines( cut ):
-  match = DEFINEsBLOCkRE.search( str(cut) )
   defines = a_defines()
-  if match:
-    definesblock = match.group(1)
-    cut.replace_preserving( [ ( match.start(), match.end(), "" ) ] )
+  blocks = DEFINEsBLOCkRE.finditer( str(cut) )
+  to_replace = []
+  for b in blocks:
+    definesblock = b.group(1)
+    to_replace.append( ( b.start(), b.end(), "" ) )
 
     definesmatch = DEFINEsRE.finditer( definesblock )
     for d in definesmatch:
@@ -510,6 +511,7 @@ def read_defines( cut ):
       body = expand_defines( defines, body )
       #
       defines.add_def( name, body )
+  cut.replace_preserving( to_replace )
   return defines
 
 # TODO strings support

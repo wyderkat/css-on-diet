@@ -17,6 +17,7 @@ test_file_formats() { file_formats; }
 test_rgba() { one2one rgba1; }
 test_consume_strings() { one2one strings1; }
 test_include() { include1; }
+test_multipledefines() { one2one multipledefines; }
 
 
 oneTimeSetUp()
