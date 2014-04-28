@@ -2,6 +2,8 @@ V1.2 2014-04-25
 
   * Including and zipping COD and raw CSS files (@cod-includes)
 
+  * Multiple @cod-defines fix
+
 v1.1 2014-04-15  
 
   * CSS Minifier (--minify-css)
