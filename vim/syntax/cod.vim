@@ -1,11 +1,10 @@
 " Vim syntax file
-" Language:	CSS 3
-" Based On: css.vim (from Vim 7.3)
-" Original Author: Claudio Fleiner <claudio@fleiner.com>
-" Maintainer: fremff <sorathone@gmail.com>
-" Last Change: 2013-05-08
-" Version: 1.3.0
-
+" Language:        CSS-On-Diet
+" Maintainer:	   Tomasz Wyderka <wyderkat@cofoh.com>
+" URL:		   http://www.cofoh.com/css-on-diet
+" Last Change:	   2014 Apr 29
+" Based On:        CSS3 syntax by fremff <sorathone@gmail.com>
+" Oryginal Author: Claudio Fleiner
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -15,10 +14,11 @@ if !exists("main_syntax")
   elseif exists("b:current_syntax")
     finish
   endif
-  let main_syntax = 'css'
+  let main_syntax = 'cod'
 endif
 
 syn case ignore
+
 
 " Selectors
 
@@ -61,6 +61,8 @@ endtry
 syn match   cssValueNumber contained "[-+]\=\d\+\%(\.\d\+\)\=\|\.\d\+" display
 syn match   cssValuePercentage contained "\%(\d\+\%(\.\d\+\)\=\|\.\d\+\)%" display
 syn match   cssValueLength contained "\%([-+]\=\d\+\%(\.\d\+\)\=\|\.\d\+\)\(mm\|ch\|cm\|in\|pt\|pc\|r\=em\|ex\|px\|vh\|vw\|vmin\|vmax\)\>" display
+syn match   codValueLength contained "\%([-+]\=\d\+\%(\.\d\+\)\=\|\.\d\+\)\(p\|e\|i\|c\|m\|x\)\>" display
+
 syn match   cssValueAngle contained "\%([-+]\=\d\+\%(\.\d\+\)\=\|\.\d\+\)\(deg\|g\=rad\|turn\)\>" display
 syn match   cssValueTime contained "\%([-+]\=\d\+\%(\.\d\+\)\=\|\.\d\+\)\(ms\|s\)\>" display
 syn match   cssValueFrequency contained "\%([-+]\=\d\+\%(\.\d\+\)\=\|\.\d\+\)\(Hz\|kHz\)\>" display
@@ -86,6 +88,7 @@ syn case ignore
 syn match   cssColor contained "\<transparent\>" display
 syn match   cssColor contained "#[0-9A-Fa-f]\{3\}\>" display
 syn match   cssColor contained "#[0-9A-Fa-f]\{6\}\>" display
+syn match   codColor contained "#[0-9A-Fa-f]\{8\}\>" display
 
 " Functions
 
@@ -99,11 +102,18 @@ syn region  cssFunction transparent contained matchgroup=cssFunctionName start="
 "  Mozilla Extension of the CSS background-image
 syn region  cssFunction transparent contained matchgroup=cssFunctionName start="\<-moz-image-rect\s*(" end=")" oneline display
 "  'calc()' function
-syn region  cssFunction transparent contained matchgroup=cssFunctionName start="\(-\(webkit\)-\|\(-\(moz\)-\)\@<!\)calc\s*(" end=")" contains=cssFunction,cssCalcExpressions,cssValue.* oneline display
+syn region  cssFunction transparent contained matchgroup=cssFunctionName start="\(-\(webkit\)-\|\(-\(moz\)-\)\@<!\)calc\s*(" end=")" contains=cssFunction,cssCalcExpressions,cssValue.*,codValueLength oneline display
 syn match   cssCalcExpressions contained "\%(+\|-\|\*\|\/\)" display
 
 
 syn match   cssImportant contained "!\s*important\>" display
+
+" COD mnemonics
+"
+syn keyword codAllAttr contained !i %% ab al au ba bb bh bl bo bt ca cb ce da db de do ea ei eo fi hi ib if ih ii il io is it le li lo mi nm no nr nw pb po re ri rx ry so st ta to tr un up vi wh
+syn keyword codOthersProp contained col wid hei bac bai bap bas bar bal baa bao dis con fos fow fof fot fov pos pal pat pab par mal mat mab mar flo top lih bbc bbl bbr bbs bbw bcp bco bio bir bil bis biw blc bls blw bra brc brs brw bsp bst btc btl btr bts btw bwi lef tea ted tet tes tei teo ter zin vea ovx ovy opa cle les cur rig ouc ous ouo ouw bot lit lii lio bos boz zoo maw miw mih mah fil whs vis wos wob wow ann and ant any ani anr anf anp tfo tfs tiy tid tip tit
+syn match codOneHyphenProp contained "\<\(ba\|fo\|pa\|ma\|ov\|ou\|li\|an\|tf\|ti\)-\s\@="
+syn match codBorderHyphenProp contained "\<\(b-\|bb\|bi\|bl\|br\|bt\)-\s\@="
 
 " Properties and Property values
 
@@ -281,7 +291,7 @@ syn match   cssBoxAttr contained "\<\(flex-\%(start\|end\)\|\(row\|column\|wrap\
 syn match   cssBraces contained "[{}]"
 syn match   cssError contained "{@<>"
 "syn region  cssDefinition fold transparent matchgroup=cssBraces start='{' end='}' contains=cssProperty,cssComment,,cssError
-syn region  cssDefinition fold transparent matchgroup=cssBraces start='{' end='}' contains=css.*Attr,css.*Prop,cssComment,cssValue.*,cssColor,cssURL,cssImportant,cssError,cssStringQ,cssStringQQ,cssFunction,cssUnicodeEscape
+syn region  cssDefinition fold transparent matchgroup=cssBraces start='{' end='}' contains=css.*Attr,css.*Prop,codAllAttr,cod.*Prop,cssComment,codComment,cssValue.*,codValueLength,cssColor,codColor,cssURL,cssImportant,cssError,cssStringQ,cssStringQQ,cssFunction,cssUnicodeEscape
 syn match   cssBraceError "}"
 
 " At-rule Group
@@ -290,11 +300,11 @@ syn match   cssBraceError "}"
 syn match   cssMedia "@media\>" nextgroup=cssMediaType,cssMediaOperators,cssMediaBrackets skipwhite
 syn keyword cssMediaType contained screen print aural braile embosed handheld projection tty tv all nextgroup=cssMediaComma,cssMediaBlock,cssMediaAnd skipwhite
 syn match   cssMediaComma contained "," nextgroup=cssMediaType skipwhite
-syn region  cssMediaBlock fold transparent contained matchgroup=cssBraces start='{' end='}' contains=cssDocument,cssPage,cssFontDescriptor,cssKeyFrame,cssSupports,cssTagName,cssError,cssComment,cssDefinition,cssUnicodeEscape,cssIdentifier,cssAttributeSelector,@cssPseudo,cssSelectorOp,cssClassName
+syn region  cssMediaBlock fold transparent contained matchgroup=cssBraces start='{' end='}' contains=cssDocument,cssPage,cssFontDescriptor,codDefinesDescriptor,codIncludesDescriptor,cssKeyFrame,cssSupports,cssTagName,cssError,cssComment,codComment,cssDefinition,cssUnicodeEscape,cssIdentifier,cssAttributeSelector,@cssPseudo,cssSelectorOp,cssClassName
 syn match   cssMediaAnd "\s\zsand\ze\s" contained nextgroup=cssMediaBrackets skipwhite
 syn match   cssMediaOperators "\<\(not\|only\)\>" contained nextgroup=cssMediaType skipwhite
 syn match   cssMediaFeatures contained "\<\(\(\(min\|max\)-\)\=\(\(\(device-\)\=\(height\|width\|aspect-ratio\)\)\|color\(-index\)\=\|monochrome\|resolution\)\|grid\|scan\|orientation\)\>" display nextgroup=cssMediaColon skipwhite
-syn match   cssMediaColon contained ":" display nextgroup=cssMediaFeaturesValueError,css.\+Attr,cssValue.\+ skipwhite
+syn match   cssMediaColon contained ":" display nextgroup=cssMediaFeaturesValueError,css.\+Attr,cssValue.\+,codValueLength skipwhite
 syn region  cssMediaBrackets transparent contained start='(' end=')' contains=cssMediaFeatures nextgroup=cssMediaComma,cssMediaAnd,cssMediaBlock skipwhite
 syn match   cssMediaFeaturesValueError contained "\(:\s*\)\@<=-\d\+\(\.\d\+\)\=" display
 
@@ -304,15 +314,15 @@ syn region  cssDomain contained matchgroup=cssFunctionName start="\<domain\s*(" 
 syn region  cssRegexp contained matchgroup=cssFunctionName start="\<regexp\s*(\ze['"]" end="['"]\zs)" contains=cssRegexpError nextgroup=cssDocumentComma,cssDocumentBlock oneline keepend skipwhite
 syn match   cssDocumentComma contained "," nextgroup=cssDUrl,cssURLPrefix,cssDomain,cssRegexp skipwhite skipnl
 syn region  cssDUrl contained matchgroup=cssFunctionName start="\<url\s*(" end=")" nextgroup=cssDocumentComma,cssDocumentBlock oneline keepend skipwhite
-syn region  cssDocumentBlock fold contained transparent matchgroup=cssBraces start='{' end='}' contains=cssError,cssComment,cssPage,cssMedia,cssFontDescriptor,cssKeyFrame,cssSupports,cssNestedSelector
-syn match   cssNestedSelector transparent contained "[a-zA-Z*#.:\\][^{]*" contains=@cssPseudo,cssComment,cssError,cssAttributeSelector,cssSelectorOp,cssUnicodeEscape,cssTagName,cssClassName,cssIdentifier nextgroup=cssDefinition skipwhite skipnl skipempty
+syn region  cssDocumentBlock fold contained transparent matchgroup=cssBraces start='{' end='}' contains=cssError,cssComment,codComment,cssPage,cssMedia,cssFontDescriptor,codDefinesDescriptor,codIncludesDescriptor,cssKeyFrame,cssSupports,cssNestedSelector
+syn match   cssNestedSelector transparent contained "[a-zA-Z*#.:\\][^{]*" contains=@cssPseudo,cssComment,codComment,cssError,cssAttributeSelector,cssSelectorOp,cssUnicodeEscape,cssTagName,cssClassName,cssIdentifier nextgroup=cssDefinition skipwhite skipnl skipempty
 syn match   cssRegexpError contained +\(\<regexp(\)\@<=[^'"].*\()\%(,\s*\a\+(\|\s*{\(\s*\d\)\@!\)\)\@=\|\(\<regexp(\)\@<=['][^']*\()\%(,\s*\a\+(\|\s*{\(\s*\d\)\@!\)\)\@=\|\(\<regexp(\)\@<=["][^"]*\()\%(,\s*\a\+(\|\s*{\(\s*\d\)\@!\)\)\@=\|\\\@<!\\[^\\]+ display
 
 " Incomplete
 syn region  cssSupports transparent matchgroup=cssSupports start="^\s*\zs@supports\>" end="\ze{" contains=cssSupportsOperators,cssSupportsBrackets nextgroup=cssSupportsBlock
 syn match   cssSupportsOperators contained "\(\<not\|\s\zs\%(and\|or\)\)\>\ze\%(\s\|$\)"
-syn region  cssSupportsBrackets transparent contained start="(" end=")" contains=css.*Prop,css.*Attr,cssValue.*,cssSupportsOperators,cssSupportsBrackets
-syn region  cssSupportsBlock fold transparent contained matchgroup=cssBraces start='{' end='}' contains=cssError,cssComment,cssPage,cssMedia,cssFontDescriptor,cssKeyFrame,cssDocument,cssNestedSelector
+syn region  cssSupportsBrackets transparent contained start="(" end=")" contains=css.*Prop,css.*Attr,codAllAttr,cod.*Prop,cssValue.*,codValueLength,cssSupportsOperators,cssSupportsBrackets
+syn region  cssSupportsBlock fold transparent contained matchgroup=cssBraces start='{' end='}' contains=cssError,cssComment,cssComment,cssPage,cssMedia,cssFontDescriptor,codDefinesDescriptor,codIncludesDescriptor,cssKeyFrame,cssDocument,cssNestedSelector
 
 "     Conditional Group Rules End
 
@@ -320,26 +330,36 @@ syn match   cssPage "@page\>" nextgroup=cssPseudoClassId,cssDefinition
 
 syn match   cssKeyFrame "@\(-webkit-\)\=\(-\(moz\|o\)-\)\@<!keyframes\>" nextgroup=cssKeyFrameID skipwhite skipnl
 syn match   cssKeyFrameID contained "\<[a-zA-Z0-9_-]\+\>" nextgroup=cssKeyFrameBlock skipwhite skipnl
-syn region  cssKeyFrameBlock fold transparent contained matchgroup=cssBraces start="{" end="}" contains=cssError,cssComment,cssKeyFrameTime
+syn region  cssKeyFrameBlock fold transparent contained matchgroup=cssBraces start="{" end="}" contains=cssError,cssComment,codComment,cssKeyFrameTime
 syn match   cssKeyFrameTime contained "\<\(from\|to\)\>\|\d\+%" nextgroup=cssDefinition skipwhite skipnl
 
 syn match   cssFontDescriptor "@font-face\>" nextgroup=cssFontDescriptorBlock skipwhite skipnl
-syn region  cssFontDescriptorBlock fold contained transparent matchgroup=cssBraces start="{" end="}" contains=cssComment,cssError,cssUnicodeEscape,cssFontProp,cssFontAttr,cssCommonAttr,cssStringQ,cssStringQQ,cssFontDescriptorProp,cssValue.*,cssFontDescriptorFunction,cssUnicodeRange,cssFontDescriptorAttr,cssImportant
+syn region  cssFontDescriptorBlock fold contained transparent matchgroup=cssBraces start="{" end="}" contains=cssComment,codComment,cssError,cssUnicodeEscape,cssFontProp,cssFontAttr,cssCommonAttr,cssStringQ,cssStringQQ,cssFontDescriptorProp,cssValue.*,codValueLength,cssFontDescriptorFunction,cssUnicodeRange,cssFontDescriptorAttr,cssImportant
 syn match   cssFontDescriptorProp contained "\<\(unicode-range\|unit-per-em\|panose-1\|cap-height\|x-height\|definition-src\)\>\(\s*:\)\@=" display
 syn keyword cssFontDescriptorProp contained src stemv stemh slope ascent descent widths bbox baseline centerline mathline topline
 syn keyword cssFontDescriptorAttr contained all
 syn region  cssFontDescriptorFunction contained matchgroup=cssFunctionName start="\<\(uri\|url\|local\|format\)\s*(" end=")" contains=cssStringQ,cssStringQQ oneline keepend
+
+syn match   codDefinesDescriptor "@cod-defines\?\>" nextgroup=codDefinesDescriptorBlock skipwhite skipnl
+syn region  codDefinesDescriptorBlock fold contained transparent matchgroup=cssBraces start="{" end="}" contains=cssComment,codComment,codDefineDeclaration
+syn region  codDefineDeclaration contained transparent start="^" end="$" contains=cssComment,codComment,codDefineName,codDefineArgument
+syn match   codDefineName contained "^\s*[-0-9A-Za-z_]\+\s" 
+syn match   codDefineArgument contained "_ARG\d\+_" 
+
+syn match   codIncludesDescriptor "@cod-includes\?\>" nextgroup=codIncludesDescriptorBlock skipwhite skipnl
+syn region  codIncludesDescriptorBlock fold contained matchgroup=cssBraces start="{" end="}" contains=cssComment,codComment
+
 syn match   cssUnicodeRange contained "U+[0-9A-Fa-f?]\+" display
 syn match   cssUnicodeRange contained "U+\x\+-\x\+" display
 
 "   Nested at-rules End
 
-syn region  cssNameSpace transparent matchgroup=cssNameSpace start="@namespace" end=";"he=e-1 contains=cssComment,cssStringQ,cssStringQQ,cssURL,cssNameSpaceName
+syn region  cssNameSpace transparent matchgroup=cssNameSpace start="@namespace" end=";"he=e-1 contains=cssComment,codComment,cssStringQ,cssStringQQ,cssURL,cssNameSpaceName
 syn match   cssNameSpaceName contained "\s\zs\<[a-zA-Z]\+\>\ze\s" display
 
-syn region  cssInclude transparent matchgroup=cssInclude start="@import" end=";"he=e-1 contains=cssComment,cssURL,cssUnicodeEscape,cssMediaType,cssStringQ,cssStringQQ
+syn region  cssInclude transparent matchgroup=cssInclude start="@import" end=";"he=e-1 contains=cssComment,codComment,cssURL,cssUnicodeEscape,cssMediaType,cssStringQ,cssStringQQ
 
-syn region  cssCharset transparent matchgroup=cssCharset start="^@charset\ze\s" end=";"he=e-1 contains=cssComment,cssStringQ,cssStringQQ
+syn region  cssCharset transparent matchgroup=cssCharset start="^@charset\ze\s" end=";"he=e-1 contains=cssComment,codComment,cssStringQ,cssStringQQ
 
 " At-rule Group End
 
@@ -357,7 +377,8 @@ syn region  cssPseudoClassNot matchgroup=cssPseudoClassId start=":not(" end=")" 
 syn match   cssBracketsElement contained "(\( \=\%([-+]\=\%(\d\+n\=\|n\) \=\%([-+] \=\d\+ \=\)\=\|\%(even\|odd\) \=\)\))"hs=s+1,he=e-1 display
 syn cluster cssPseudo contains=cssPseudoElement,cssPseudoClassId,cssPseudoClassNot,cssPseudoClassLang
 
-syn region  cssComment start="/\*" end="\*/" contains=@Spell
+syn region  cssComment start="/\*" end="\*/" contains=@Spell,cssComment
+syn region  codComment start="//"  end="$" contains=@Spell
 
 syn match   cssUnicodeEscape "\\\x\{1,6}\s\?" display
 syn match   cssSpecialCharQQ +\\"+ contained display
@@ -365,7 +386,6 @@ syn match   cssSpecialCharQ +\\'+ contained display
 syn region  cssStringQQ start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=cssUnicodeEscape,cssSpecialCharQQ
 syn region  cssStringQ start=+'+ skip=+\\\\\|\\'+ end=+'+ contains=cssUnicodeEscape,cssSpecialCharQ
 syn match   cssClassName "\.[A-Za-z][A-Za-z0-9_-]*" display
-
 
 if main_syntax == 'css'
   " Syntax sync options
@@ -379,21 +399,6 @@ if main_syntax == 'css'
   setlocal iskeyword+=-
 endif
 
-" Beautify CSS command
-command! -buffer CSSBeautify call s:BeautifyTheCSS()
-function! s:BeautifyTheCSS()
-  execute "normal mz"
-  %s/\%(\S\ze\|\s\{2,\}\|\s*\%(\n\s*\)\+\)\({\(\d\+\(,\d*\)\=}\)\@!\)\@=/ /ge|
-    \ %s/{\s*\(\s*\n\|\d\+\(,\d*\)\=}\)\@!/{\r/ge|
-    \ %s/\(\({\(\d*,\)\=\d*\)\@<![^;{}\t ]\)\@<=\(\s*\(\n\s*\)*}\)\@=/;/ge|
-    \ %s/\(}\|;\)\@<=\s*\%(\%(\n\s*\)\+\(\s\)\@<=\)\=}/\r}/ge|
-    \ %s/;\([^:;]\+:\)\@=/;\r/ge|
-    \ %s/\(\d\)\@<!}\s*\([A-Za-z0-9#*.@:][^{]*{\)\@=/}\r/ge|
-    \ %s/\s\+$//e|
-    \ %s/\(^\s*[a-zA-Z-]\+\s*:\)\@<=\(\(\s\)\@!\|\s\{2,\}\)\|\(^\s*[a-zA-Z-]\+\s*:.*\S\)\@<=\(\s\{2,\}\)\=\(!\s*important\s*;$\|\(!\s*important\s*\)\@<!;$\)\@=/ /ge
-  execute "normal `z"
-endfunction
-
 " Define the default highlighting.
 " For version 5.7 and earlier: only when not done already
 " For version 5.8 and later: only when an item doesn't have highlighting yet
@@ -406,6 +411,7 @@ if version >= 508 || !exists("did_css_syn_inits")
   endif
 
   HiLink cssComment Comment
+  HiLink codComment Comment
   HiLink cssTagName Statement
   HiLink cssSelectorOp Special
   HiLink cssSelectorOp2 Special
@@ -419,6 +425,9 @@ if version >= 508 || !exists("did_css_syn_inits")
   HiLink cssPagingProp StorageClass
   HiLink cssTableProp StorageClass
   HiLink cssUIProp StorageClass
+  HiLink codOneHyphenProp StorageClass
+  HiLink codBorderHyphenProp StorageClass
+  HiLink codOthersProp StorageClass
   HiLink cssFontAttr Type
   HiLink cssColorAttr Type
   HiLink cssTextAttr Type
@@ -430,10 +439,12 @@ if version >= 508 || !exists("did_css_syn_inits")
   HiLink cssTableAttr Type
   HiLink cssUIAttr Type
   HiLink cssCommonAttr Type
+  HiLink codAllAttr Type
   HiLink cssPseudoClassId PreProc
   HiLink cssPseudoElement PreProc
   HiLink cssPseudoClassLang Constant
   HiLink cssValueLength Number
+  HiLink codValueLength Number
   HiLink cssValuePercentage Number
   HiLink cssValueNumber Number
   HiLink cssValueAngle Number
@@ -443,6 +454,7 @@ if version >= 508 || !exists("did_css_syn_inits")
   HiLink cssURL String
   HiLink cssFunctionName Function
   HiLink cssColor Constant
+  HiLink codColor Constant
   HiLink cssIdentifier Function
   HiLink cssImportant Special
   HiLink cssBraces Function
@@ -463,6 +475,11 @@ if version >= 508 || !exists("did_css_syn_inits")
   HiLink cssFontDescriptorFunction Constant
   HiLink cssFontDescriptorProp StorageClass
   HiLink cssFontDescriptorAttr Type
+  HiLink codDefinesDescriptor Statement
+  HiLink codDefineName Constant
+  HiLink codDefineArgument Special
+  HiLink codIncludesDescriptor Statement
+  HiLink codIncludesDescriptorBlock Constant
   HiLink cssUnicodeRange Constant
   HiLink cssClassName Function
   HiLink cssBracketsElement Number
@@ -482,9 +499,9 @@ if version >= 508 || !exists("did_css_syn_inits")
   delcommand HiLink
 endif
 
-let b:current_syntax = "css"
+let b:current_syntax = "cod"
 
-if main_syntax == 'css'
+if main_syntax == 'cod'
   unlet main_syntax
 endif
 
