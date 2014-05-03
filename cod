@@ -677,7 +677,8 @@ SEtRE = re.compile( r"""
   (  # main body
     (?:
       %s | # whole string or
-      . # any character outside whole string
+      [^{] # any character outside whole string
+           # exclude { in case of @media and @font
     )*?
   )
 }
