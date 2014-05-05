@@ -18,9 +18,11 @@
   <string>CSS-On-Diet</string>
   <key>patterns</key>
 <array>
-  <dict>
-    <key>include</key>
-    <string>#comment-block</string>
+  <dict> 
+    <key>include</key> <string>#comment-block</string> 
+  </dict>
+  <dict> 
+    <key>include</key> <string>#cod-comment-block</string> 
   </dict>
   <dict>
     <key>include</key>
@@ -468,20 +470,36 @@
 </dict>
 <key>comment-block</key>
 <dict>
-  <key>begin</key>
-  <string>/\*</string>
+  <key>begin</key> <string>/\*</string>
   <key>captures</key>
   <dict>
     <key>0</key>
     <dict>
-      <key>name</key>
-      <string>punctuation.definition.comment.css</string>
+      <key>name</key> <string>punctuation.definition.comment.css</string>
     </dict>
   </dict>
-  <key>end</key>
-  <string>\*/</string>
-  <key>name</key>
-  <string>comment.block.css</string>
+  <key>end</key> <string>\*/</string>
+  
+  <key>patterns</key>
+  <array>
+    <dict>
+      <key>include</key> <string>#comment-block</string>
+    </dict>
+  </array>
+  <key>name</key> <string>comment.block.css</string>
+</dict>
+<key>cod-comment-block</key>
+<dict>
+  <key>begin</key> <string>//</string>
+  <key>captures</key>
+  <dict>
+    <key>0</key>
+    <dict>
+      <key>name</key> <string>punctuation.definition.comment.css</string>
+    </dict>
+  </dict>
+  <key>end</key> <string>$</string>
+  <key>name</key> <string>comment.block.css</string>
 </dict>
 <key>keyframe-name-list</key>
 <dict>
@@ -674,7 +692,7 @@
       <key>match</key>
       <string>(?x)
           (?:-|\+)?(?:(?:[0-9]+(?:\.[0-9]+)?)|(?:\.[0-9]+))
-          ((?:px|pt|ch|cm|mm|in|r?em|ex|pc|deg|g?rad|turn|dpi|dpcm|dppx|s|ms|x|vh|vw|vmin|vmax)\b|%)?
+          ((?:px|pt|ch|cm|mm|in|r?em|ex|pc|deg|g?rad|turn|dpi|dpcm|dppx|s|ms|x|vh|vw|vmin|vmax|p|e|i|c|m|x)\b|%)?
       </string>
       <key>name</key>
       <string>constant.numeric.css</string>
@@ -1020,8 +1038,10 @@
   <key>patterns</key>
   <array>
     <dict>
-      <key>include</key>
-      <string>#comment-block</string>
+      <key>include</key> <string>#comment-block</string>
+    </dict>
+    <dict>
+      <key>include</key> <string>#cod-comment-block</string>
     </dict>
     <dict>
       <key>begin</key>
@@ -1062,6 +1082,12 @@
         <dict>
           <key>match</key>
           <string>\b(azimuth|
+            |ba-|fo-|pa-|ma-|ov-|ou-|li-|an-|tf-|ti-|
+            |(b-|bb|bi|bl|br|bt)-|
+            |col|wid|hei|bac|bai|bap|bas|bar|bal|baa|bao|dis|con|fos|fow|fof|fot|fov|pos|pal|pat|pab|par|mal|mat|mab|mar|
+            |flo|top|lih|bbc|bbl|bbr|bbs|bbw|bcp|bco|bio|bir|bil|bis|biw|blc|bls|blw|bra|brc|brs|brw|bsp|bst|btc|btl|btr|
+            |bts|btw|bwi|lef|tea|ted|tet|tes|tei|teo|ter|zin|vea|ovx|ovy|opa|cle|les|cur|rig|ouc|ous|ouo|ouw|bot|lit|lii|
+            |lio|bos|boz|zoo|maw|miw|mih|mah|fil|whs|vis|wos|wob|wow|ann|and|ant|any|ani|anr|anf|anp|tfo|tfs|tiy|tid|tip|tit|
             |all|
             |appearance|
             |align(-items|-content|-self)?|
@@ -1467,8 +1493,8 @@
 </dict>
   </dict>
   <key>scopeName</key>
-  <string>source.css</string>
+  <string>source.cssondiet</string>
   <key>uuid</key>
-  <string>69AA0917-B7BB-11D9-A7E2-000D93C8BE28</string>
+  <string>901a9200-d37d-11e3-9c1a-0800200c9a66</string>
 </dict>
 </plist>
