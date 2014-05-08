@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+<!-- TODO:
+     1. comment-block and comment-line should be in one bucket, 
+        for easy include
+     2. missing comments in cod-include and cod-defines
+-->
 <dict>
   <key>comment</key>
   <string></string>
@@ -57,6 +62,102 @@
       <dict>
         <key>include</key>
         <string>#string-single</string>
+      </dict>
+    </array>
+  </dict>
+  <dict desc="@cod-defines">
+    <key>begin</key>
+    <string>\s*((@)cod-defines?)\s*\{</string>
+    <key>beginCaptures</key>
+    <dict>
+      <key>1</key>
+      <dict>
+        <key>name</key>
+        <string>keyword.control.at-rule.font-face.css</string>
+      </dict>
+      <key>2</key>
+      <dict>
+        <key>name</key>
+        <string>punctuation.definition.keyword.css</string>
+      </dict>
+    </dict>
+    <key>end</key>
+    <string>\s*(\})</string>
+    <key>endCaptures</key>
+    <dict>
+      <key>1</key>
+      <dict>
+        <key>name</key>
+        <string>punctuation.section.property-list.css</string>
+      </dict>
+    </dict>
+    <key>name</key>
+    <string>meta.at-rule.define.cod</string>
+    <key>patterns</key>
+    <array>
+      <dict desc="comment-block"> 
+        <key>include</key> <string>#comment-block</string> 
+      </dict>
+      <dict desc="cod comment-line"> 
+        <key>include</key> <string>#cod-comment-line</string> 
+      </dict>
+      <dict>
+        <key>match</key>
+        <string>\S+\s+(.*)$</string>
+        <key>name</key>
+        <string>constant.define.cod</string>
+        <key>captures</key>
+        <dict>
+          <key>1</key>
+          <dict>
+            <key>name</key>
+            <string>string.other.define.cod</string>
+          </dict>
+        </dict>
+      </dict>
+    </array>
+  </dict>
+  <dict desc="@cod-includes">
+    <key>begin</key>
+    <string>\s*((@)cod-includes?)\s*\{</string>
+    <key>beginCaptures</key>
+    <dict>
+      <key>1</key>
+      <dict>
+        <key>name</key>
+        <string>keyword.control.at-rule.font-face.css</string>
+      </dict>
+      <key>2</key>
+      <dict>
+        <key>name</key>
+        <string>punctuation.definition.keyword.css</string>
+      </dict>
+    </dict>
+    <key>end</key>
+    <string>\s*(\})</string>
+    <key>endCaptures</key>
+    <dict>
+      <key>1</key>
+      <dict>
+        <key>name</key>
+        <string>punctuation.section.property-list.css</string>
+      </dict>
+    </dict>
+    <key>name</key>
+    <string>meta.at-rule.include.cod</string>
+    <key>patterns</key>
+    <array>
+      <dict desc="comment-block"> 
+        <key>include</key> <string>#comment-block</string> 
+      </dict>
+      <dict desc="cod comment-line"> 
+        <key>include</key> <string>#cod-comment-line</string> 
+      </dict>
+      <dict>
+        <key>match</key>
+        <string>\S.*[^}\s]\s*(?=\}|$)</string>
+        <key>name</key>
+        <string>string.other.include.cod</string>
       </dict>
     </array>
   </dict>
@@ -666,7 +767,21 @@
 <dict>
   <key>patterns</key>
   <array>
-    <dict>
+    <dict desc="cod color hexadecimal rgba values">
+      <key>captures</key>
+      <dict>
+        <key>1</key>
+        <dict>
+          <key>name</key>
+          <string>punctuation.definition.constant.css</string>
+        </dict>
+      </dict>
+      <key>match</key>
+      <string>(#)([0-9a-fA-F]{8})\b</string>
+      <key>name</key>
+      <string>constant.other.color.rgb-value.css</string>
+    </dict>
+    <dict desc="color hex values (not rgba)">
       <key>captures</key>
       <dict>
         <key>1</key>
@@ -680,7 +795,7 @@
       <key>name</key>
       <string>constant.other.color.rgb-value.css</string>
     </dict>
-    <dict>
+    <dict desc="unit values">
       <key>captures</key>
       <dict>
         <key>1</key>
