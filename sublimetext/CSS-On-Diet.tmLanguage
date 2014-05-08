@@ -18,17 +18,17 @@
   <string>CSS-On-Diet</string>
   <key>patterns</key>
 <array>
-  <dict> 
+  <dict desc="comment-block"> 
     <key>include</key> <string>#comment-block</string> 
   </dict>
-  <dict> 
-    <key>include</key> <string>#cod-comment-block</string> 
+  <dict desc="cod comment-line"> 
+    <key>include</key> <string>#cod-comment-line</string> 
   </dict>
-  <dict>
+  <dict desc="selector">
     <key>include</key>
     <string>#selector</string>
   </dict>
-  <dict>
+  <dict desc="@charset">
     <key>begin</key>
     <string>\s*((@)charset\b)\s*</string>
     <key>captures</key>
@@ -60,7 +60,7 @@
       </dict>
     </array>
   </dict>
-  <dict>
+  <dict desc="@import">
     <key>begin</key>
     <string>\s*((@)import\b)\s*</string>
     <key>captures</key>
@@ -140,7 +140,7 @@
       </dict>
     </array>
   </dict>
-  <dict>
+  <dict desc="@font-face">
     <key>begin</key>
     <string>\s*((@)font-face)\s*(?=\{)</string>
     <key>beginCaptures</key>
@@ -176,7 +176,7 @@
       </dict>
     </array>
   </dict>
-  <dict>
+  <dict desc="@media">
     <key>begin</key>
     <string>(?=\s*@media\s*.*?)</string>
     <key>end</key>
@@ -191,7 +191,7 @@
     </dict>
     <key>patterns</key>
     <array>
-      <dict>
+      <dict desc="media-query-list">
         <key>begin</key>
         <string>\s*((@)media)(?=.*?)</string>
         <key>beginCaptures</key>
@@ -224,7 +224,7 @@
           </dict>
         </array>
       </dict>
-      <dict>
+      <dict desc="media recursive body">
         <key>begin</key>
         <string>\s*(\{)</string>
         <key>beginCaptures</key>
@@ -247,7 +247,7 @@
       </dict>
     </array>
   </dict>
-  <dict>
+  <dict desc="@keyframes">
     <key>begin</key>
     <string>(?=\s*@(-webkit-|-moz-|-o-)?keyframes\s*.*?)</string>
     <key>end</key>
@@ -323,7 +323,7 @@
       </dict>
     </array>
   </dict>
-  <dict>
+  <dict desc="everything else from {} -> #rule-list">
     <key>begin</key>
     <string>(?=\{)</string>
     <key>end</key>
@@ -488,18 +488,18 @@
   </array>
   <key>name</key> <string>comment.block.css</string>
 </dict>
-<key>cod-comment-block</key>
+<key>cod-comment-line</key>
 <dict>
   <key>begin</key> <string>//</string>
   <key>captures</key>
   <dict>
     <key>0</key>
     <dict>
-      <key>name</key> <string>punctuation.definition.comment.css</string>
+      <key>name</key> <string>punctuation.definition.comment.cod</string>
     </dict>
   </dict>
   <key>end</key> <string>$</string>
-  <key>name</key> <string>comment.block.css</string>
+  <key>name</key> <string>comment.line.cod</string>
 </dict>
 <key>keyframe-name-list</key>
 <dict>
@@ -703,14 +703,27 @@
 <dict>
   <key>patterns</key>
   <array>
-    <dict>
+    <dict desc="comment block">
+      <key>include</key> <string>#comment-block</string>
+    </dict>
+    <dict desc="comment line">
+      <key>include</key> <string>#cod-comment-line</string>
+    </dict>
+    <dict desc="prefixes">
       <key>match</key>
       <string>(-webkit-|-moz-|-ms-|-o-)</string>
       <key>name</key>
       <string>support.type.property-vendor.css</string>
     </dict>
-    <dict>
-      <key>comment</key>
+    <dict desc="cod values">
+      <key>match</key>
+      <string>%%|\b(!i|ab|al|au|ba|bb|bh|bl|bo|bt|ca|cb|ce|da|db|de|do|ea|ei|eo|fi|hi|ib|
+        |if|ih|ii|il|io|is|it|le|li|lo|mi|nm|no|nr|nw|pb|po|re|ri|rx|ry|so|st|ta|to|tr|un|up|vi|wh)\b</string>
+      <key>name</key>
+      <string>support.constant.property-value.cod</string>
+    </dict>
+    <dict desc="animatable">
+     <key>comment</key>
       <string>animatable properties</string>
       <key>match</key>
       <string>\b(all|
@@ -768,7 +781,7 @@
       <key>name</key>
       <string>support.constant.property-value.css</string>
     </dict>
-    <dict>
+    <dict desc="not-animatable">
       <key>match</key>
       <string>\b(absolute|all-scroll|always|armenian|auto|avoid|baseline|below|bidi-override|block|bold|bolder|both|bottom|break-all|break-word|capitalize|center|char|circle|cjk-ideographic|col-resize|collapse|crosshair|dashed|decimal-leading-zero|decimal|default|disabled|disc|distribute-all-lines|distribute-letter|distribute-space|distribute|dotted|double|e-resize|ellipsis|fixed|geometricPrecision|georgian|groove|hand|hebrew|help|hidden|hiragana-iroha|hiragana|horizontal|ideograph-alpha|ideograph-numeric|ideograph-parenthesis|ideograph-space|inactive|inherit|initial|unset|
         |inline-block|inline-flex|inline-flexbox|inline-table|inline|
@@ -813,29 +826,29 @@
       <key>name</key>
       <string>support.constant.property-value.css</string>
     </dict>
-    <dict>
+    <dict desc="font names">
       <key>match</key>
       <string>(\b(?i:arial|century|comic|courier|garamond|georgia|helvetica|impact|lucida|symbol|system|tahoma|times|trebuchet|utopia|verdana|webdings|sans-serif|serif|monospace)\b)</string>
       <key>name</key>
       <string>support.constant.font-name.css</string>
     </dict>
-    <dict>
+    <dict desc="#numeric-values">
       <key>include</key>
       <string>#numeric-values</string>
     </dict>
-    <dict>
+    <dict desc="#color-values">
       <key>include</key>
       <string>#color-values</string>
     </dict>
-    <dict>
+    <dict desc="#string-double">
       <key>include</key>
       <string>#string-double</string>
     </dict>
-    <dict>
+    <dict desc="#string-single">
       <key>include</key>
       <string>#string-single</string>
     </dict>
-    <dict>
+    <dict desc="rect()">
       <key>begin</key>
       <string>(rect)\s*(\()</string>
       <key>beginCaptures</key>
@@ -869,11 +882,11 @@
         </dict>
       </array>
     </dict>
-    <dict>
+    <dict desc="#cascading-variable">
       <key>include</key>
       <string>#cascading-variable</string>
     </dict>
-    <dict>
+    <dict desc="easing functions">
       <key>name</key>
       <string>support.type.function.easing.css</string>
       <key>begin</key>
@@ -921,7 +934,7 @@
         </dict>
       </array>
     </dict>
-    <dict>
+    <dict desc="calc()">
       <key>name</key>
       <string>support.type.expression.calc.css</string>
       <key>begin</key>
@@ -967,7 +980,7 @@
         </dict>
       </array>
     </dict>
-    <dict>
+    <dict desc="format|local|url|attr|counter|counters...">
       <key>begin</key>
       <string>(format|local|url|attr|counter|counters)\s*(\()</string>
       <key>beginCaptures</key>
@@ -1011,9 +1024,9 @@
         </dict>
       </array>
     </dict>
-    <dict>
+    <dict desc="important">
       <key>match</key>
-      <string>\!\s*important</string>
+      <string>(!i|!\s*important)\b</string>
       <key>name</key>
       <string>keyword.other.important.css</string>
     </dict>
@@ -1037,13 +1050,13 @@
   <string>meta.property-list.css</string>
   <key>patterns</key>
   <array>
-    <dict>
+    <dict desc="comment block">
       <key>include</key> <string>#comment-block</string>
     </dict>
-    <dict>
-      <key>include</key> <string>#cod-comment-block</string>
+    <dict desc="comment line">
+      <key>include</key> <string>#cod-comment-line</string>
     </dict>
-    <dict>
+    <dict desc="property">
       <key>begin</key>
       <string>(?&lt;![-a-z])(?=[-a-z])</string>
       <key>end</key>
@@ -1052,13 +1065,13 @@
       <string>meta.property-name.css</string>
       <key>patterns</key>
       <array>
-        <dict>
+        <dict desc="prefixes">
           <key>match</key>
           <string>(-webkit-|-moz-|-ms-|-o-)</string>
           <key>name</key>
           <string>support.type.property-vendor.css</string>
         </dict>
-        <dict>
+        <dict desc="var-">
           <key>begin</key>
           <string>\b(var-)([_a-zA-Z]+[_a-zA-Z0-9-]*)</string>
           <key>beginCaptures</key>
@@ -1079,15 +1092,19 @@
           <key>name</key>
           <string>support.type.custom-property.css</string>
         </dict>
-        <dict>
+        <dict desc="COD properties LIST">
           <key>match</key>
-          <string>\b(azimuth|
-            |ba-|fo-|pa-|ma-|ov-|ou-|li-|an-|tf-|ti-|
-            |(b-|bb|bi|bl|br|bt)-|
-            |col|wid|hei|bac|bai|bap|bas|bar|bal|baa|bao|dis|con|fos|fow|fof|fot|fov|pos|pal|pat|pab|par|mal|mat|mab|mar|
+          <string>\b(col|wid|hei|bac|bai|bap|bas|bar|bal|baa|bao|dis|con|fos|fow|fof|fot|fov|pos|pal|pat|pab|par|mal|mat|mab|mar|
             |flo|top|lih|bbc|bbl|bbr|bbs|bbw|bcp|bco|bio|bir|bil|bis|biw|blc|bls|blw|bra|brc|brs|brw|bsp|bst|btc|btl|btr|
             |bts|btw|bwi|lef|tea|ted|tet|tes|tei|teo|ter|zin|vea|ovx|ovy|opa|cle|les|cur|rig|ouc|ous|ouo|ouw|bot|lit|lii|
             |lio|bos|boz|zoo|maw|miw|mih|mah|fil|whs|vis|wos|wob|wow|ann|and|ant|any|ani|anr|anf|anp|tfo|tfs|tiy|tid|tip|tit|
+            |ba-|fo-|pa-|ma-|ov-|ou-|li-|an-|tf-|ti-|b--|bb-|bi-|bl-|br-|bt-)(?![-a-z])</string>
+          <key>name</key>
+          <string>support.type.property-name.css</string>
+        </dict>
+        <dict desc="properties LIST">
+          <key>match</key>
+          <string>\b(azimuth|
             |all|
             |appearance|
             |align(-items|-content|-self)?|
@@ -1132,19 +1149,19 @@
         </dict>
       </array>
     </dict>
-    <dict>
+    <dict desc="property value reference">
       <key>begin</key>
-      <string>(:)\s*</string>
+      <string>((:)|(?&lt;=[-a-z])\s)\s*</string>
       <key>beginCaptures</key>
       <dict>
-        <key>1</key>
+        <key>2</key>
         <dict>
           <key>name</key>
           <string>punctuation.separator.key-value.css</string>
         </dict>
       </dict>
       <key>end</key>
-      <string>\s*(;|(?=\}))</string>
+      <string>\s*(;|$|(?=\}))</string>
       <key>endCaptures</key>
       <dict>
         <key>1</key>
@@ -1157,7 +1174,7 @@
       <string>meta.property-value.css</string>
       <key>patterns</key>
       <array>
-        <dict>
+        <dict desc="property value">
           <key>include</key>
           <string>#property-values</string>
         </dict>
