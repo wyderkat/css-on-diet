@@ -200,7 +200,6 @@ UNItMNEMONICS = {
   "x":"ex",
 }
 
-import argparse
 import re
 import sys
 from os import path
@@ -859,14 +858,14 @@ def choose_nlcharacter( newlines ):
   return nl
 
 
-def do_main( a ):
-  handleout = open(a.file, 'w') if a.file!="-" else sys.stdout
+def put_css_on_diet( a ):
+  handleout = open(a.output, 'w') if a.output!="-" else sys.stdout
 
   contentcut = a_cut( "" ) # empty because it is meta cod file for cmd line args
   tomerge = []
   included_sha1 = []
   nlcharacterlist = [ ]
-  for filename in args.cod_files:
+  for filename in a.cod_files:
     incontentcut, innlcharacter = include_files_recursiv ( filename, included_sha1 )
     if incontentcut == None:
       continue
@@ -941,6 +940,7 @@ def include_files_recursiv( filename, included_sha1 ):
 
 if __name__ == "__main__":
 
+  import argparse
   parser = argparse.ArgumentParser(
     description=
 """CSS On Diet
@@ -955,9 +955,9 @@ www.cofoh.com/css-on-diet""",
                       help='Css-on-diet file list to process')
 
   parser.add_argument(
-    '-f', '--file', metavar="output.css",
+    '-o', '--output', metavar="output.css",
     default="-",
-    help='file to save result css. If not given or "-" string, print to STDOUT'
+    help='output file to save result css. If not given or "-" string, print to STDOUT'
   )
   parser.add_argument(
     '-c', '--no-comments',  action="store_true",
@@ -978,4 +978,4 @@ www.cofoh.com/css-on-diet""",
     args.no_comments = True
     args.no_header = True
 
-  do_main( args )
+  put_css_on_diet( args )

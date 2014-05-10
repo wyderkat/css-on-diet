@@ -56,7 +56,7 @@ switches()
   out=file.result.css
   expected=file.css
 
-  $COD $in -f $out
+  $COD $in -o $out
   assertSame "execution error" 0 $?
 
   assert_except_1st_line $expected $out
