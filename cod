@@ -858,7 +858,7 @@ def choose_nlcharacter( newlines ):
   return nl
 
 
-def put_css_on_diet( a ):
+def put_css_on_diet( a, err ):
   handleout = open(a.output, 'w') if a.output!="-" else sys.stdout
 
   contentcut = a_cut( "" ) # empty because it is meta cod file for cmd line args
@@ -978,4 +978,4 @@ www.cofoh.com/css-on-diet""",
     args.no_comments = True
     args.no_header = True
 
-  put_css_on_diet( args )
+  put_css_on_diet( args, None )
