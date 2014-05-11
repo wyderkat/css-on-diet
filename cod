@@ -343,7 +343,7 @@ class a_cut( object ):
       newstr += me.str[ laststridx : ]
       # copy rest of register
       againfix = 1 if again else 0
-      for i in xrange( lastregidx + againfix, len(me.cutregister) ):
+      for i in range( lastregidx + againfix, len(me.cutregister) ):
         newcutreg.append( me.cutregister[i] )
       
       # save str and register
@@ -928,7 +928,7 @@ def include_files_recursiv( filename, included_sha1 ):
 
   #
   sha1 = hashlib.sha1()
-  sha1.update( content )
+  sha1.update( content.encode('utf-8') )
   sha1 = sha1.digest()
   if sha1 in included_sha1:
     # TODO log 
