@@ -205,6 +205,16 @@ import sys
 from os import path
 import hashlib
 
+def error_handler( msg ):
+  pass
+log_err = error_handler
+
+class a_preprocess_error( Exception ):
+  def __init__(me, errorcode):
+    me.errorcode = errorcode
+
+
+
 APpDIR = path.dirname( path.realpath(__file__) )
 
 NESTEdRE = re.compile( r"\*/" )
@@ -858,8 +868,9 @@ def choose_nlcharacter( newlines ):
   return nl
 
 
-def put_css_on_diet( a, err ):
-  handleout = open(a.output, 'w') if a.output!="-" else sys.stdout
+def put_css_on_diet( a, error_handler ):
+  global log_err
+  log_err = error_handler
 
   contentcut = a_cut( "" ) # empty because it is meta cod file for cmd line args
   tomerge = []
@@ -894,6 +905,8 @@ def put_css_on_diet( a, err ):
   if nlcharacter != None:
     content = content.replace("\n", nlcharacter )
 
+  handleout = open(a.output, 'w') if a.output!="-" else sys.stdout
+
   handleout.write( content )
   if handleout is not sys.stdout:
     handleout.close()
@@ -905,13 +918,13 @@ def include_files_recursiv( filename, included_sha1 ):
       content = fh.read()
       nlcharacterlist = [ get_nlcharacter( fh ) ]
   except IOError as e:
-    sys.stderr.write( "I have problem with '%s' file. Exception '%s'.\n" \
-                     % ( str(filename), str(e.strerror) ) )
-    sys.exit(1)
+    log_err( "I have problem including '%s' file. Exception '%s'.\n" \
+        % ( str(filename), str(e.strerror) ) )
+    raise a_preprocess_error( 11 )
   except Exception as e:
-    sys.stderr.write( "I have weird problem probably with '%s' file. Exception '%s'.\n" \
-                     % ( str(filename), str(e) ) )
-    sys.exit(1)
+    log_err( "I have weird problem probably with '%s' file. Exception '%s'.\n" \
+        % ( str(filename), str(e) ) )
+    raise a_preprocess_error( 12 )
 
   #
   sha1 = hashlib.sha1()
@@ -978,4 +991,7 @@ www.cofoh.com/css-on-diet""",
     args.no_comments = True
     args.no_header = True
 
-  put_css_on_diet( args, None )
+  try:
+    put_css_on_diet( args, sys.stderr.write )
+  except a_preprocess_error as e:
+    sys.exit( e.errorcode )

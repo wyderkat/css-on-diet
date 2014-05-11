@@ -5,6 +5,9 @@ import threading
 import subprocess
 import functools
 import time
+import imp
+
+PACKAGeDIR = "CSS-On-Diet"
 
 class ProcessListener(object):
     def on_data(self, proc, data):
@@ -13,19 +16,16 @@ class ProcessListener(object):
     def on_finished(self, proc):
         pass
 
-# Run included COD compiler as a Python module
-# in separate thread, forwarding stdout to a supplied
-# ProcessListener (on a separate thread)
+# Run included COD preprocessor as a Python module
+# in a separate thread, forwarding stdout to a supplied
+# ProcessListener (on that thread)
 class EmbeddedCODInThread(threading.Thread):
-  def __init__(me, cmd, env, listener,
-          # "path" is an option in build systems
-          path="",
-          # "shell" is an options in build systems
-          shell=False):
+  def __init__(me, cmd, env, listener, path="", shell=False):
 
     threading.Thread.__init__(me, name="cssondiet")
     me.finished = False
     me.exitcode = 0
+    me.listener = listener
 
     output = None
     try:
@@ -49,27 +49,41 @@ class EmbeddedCODInThread(threading.Thread):
         me.minify_css = minify
     me.args = an_argument( inputfile, output, minify )
 
-
-    me.listener = listener
+    print "Actually running embedded COD script with inputfile=%s, " \
+        "output=%s, minify=%s\n" %( inputfile, output, str(minify))
+    script_dir = os.path.join( sublime.packages_path(), PACKAGeDIR )
+    #me.read_stderr("script_dir: %s\n" % script_dir )
 
     me.start_time = time.time()
+
+    try:
+      fp, pathname, description = imp.find_module("cod", [script_dir])
+      try:
+        me.cod_module = imp.load_module("cod", fp, pathname, description)
+      finally:
+        if fp:
+          fp.close()
+    except ImportError:
+      me.read_stderr("[Error loading embedded COD preprocessor]\n")
+      me.finished = True
+      if me.listener:
+        me.listener.on_finished(me)
+      return
 
     me.start()
 
   def run(me):
 
     try:
-      import cod
-      me.exitcode = cod.put_css_on_diet( me.args, me.read_stderr )
-    except ImportError:
-      me.read_stderr("Error loading embedded COD preprocessor\n")
-    except:
-      me.read_stderr("Internal error of COD preprocessor\n")
+      me.exitcode = me.cod_module.put_css_on_diet( me.args, me.read_stderr )
+    except me.cod_module.a_preprocess_error as e:
+      me.read_stderr("[Preprocessing Error No. %d]\n" % e.errorcode)
+    except Exception as e:
+      me.read_stderr("[Internal error of COD preprocessor: %s]\n", str(e))
     finally:
       me.finished = True
       if me.listener:
         me.listener.on_finished(me)
-
 
   def kill(me):
     pass # TODO in COD
