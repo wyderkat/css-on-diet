@@ -8,6 +8,9 @@ import imp
 
 PACKAGeDIR = "CSS-On-Diet"
 
+# "_COMMENT ON MS WINDOWS": "embedded COD works in Windows, but it excludes using external COD preprocessor. If shell is True, we cannot catch exception if external command is missing, and we cannot run embedded version then"
+
+
 class ProcessListener(object):
     def on_data(self, proc, data):
         pass
@@ -100,7 +103,7 @@ class EmbeddedCODInThread(threading.Thread):
 
   def read_stderr(me, data):
     if me.listener:
-      me.listener.on_data(me, data)
+      me.listener.on_data(me, data, pythonstring=True)
 
 
 
@@ -222,10 +225,6 @@ if sublime.version()[0] == "2":
             self.output_view.end_edit(edit)
             self.output_view.set_read_only(True)
 
-        # stub from sublime 3
-        def append_string(self, proc, str):
-            self.append_data(proc, str)
-
         def finish(self, proc):
             if not self.quiet:
                 elapsed = time.time() - proc.start_time
@@ -250,7 +249,7 @@ if sublime.version()[0] == "2":
             self.output_view.sel().add(sublime.Region(0))
             self.output_view.end_edit(edit)
 
-        def on_data(self, proc, data):
+        def on_data(self, proc, data, pythonstring = False):
             sublime.set_timeout(functools.partial(self.append_data, proc, data), 0)
 
         def on_finished(self, proc):
@@ -430,7 +429,7 @@ elif sublime.version()[0] == "3":
                     self.append_string(None, 
                       "Exception from embedded COD preprocessor: %s \n" % str(ee) )
                     if not self.quiet:
-                        self.append_data(None, "[Failed]")
+                        self.append_string(None, "[Failed]")
 
         def is_enabled(self, kill = False):
             if kill:
@@ -482,7 +481,10 @@ elif sublime.version()[0] == "3":
             else:
                 sublime.status_message(("Build finished with %d errors") % len(errs))
 
-        def on_data(self, proc, data):
+        def on_data(self, proc, data, pythonstring = False):
+          if pythonstring:
+            sublime.set_timeout(functools.partial(self.append_string, proc, data), 0)
+          else:
             sublime.set_timeout(functools.partial(self.append_data, proc, data), 0)
 
         def on_finished(self, proc):
