@@ -1,0 +1,3 @@
+[submodule "sublimetext"]
+	path = sublimetext
+	url = https://github.com/wyderkat/css-on-diet--sublime-text.git
