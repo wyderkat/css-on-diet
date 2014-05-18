@@ -825,7 +825,7 @@ INCLUDEsBLOCkRE = re.compile( r"""
 INCLUDEdFILeRE = re.compile( r"""
   \s*
   (["']?)
-  (?P<file>.+?)
+  (?P<file>.*?)
   \1
   \s*
   $
@@ -843,7 +843,8 @@ def find_includes( cut ):
     includedfiles = INCLUDEdFILeRE.finditer( includesblock )
     for i in includedfiles:
       filename = i.group("file") 
-      result.append( (filename, b.start() + delta ) )
+      if filename: # can be empty string because of surrounding spaces issue
+        result.append( (filename, b.start() + delta ) )
     delta += b.start() - b.end()
   cut.replace_preserving( to_replace )
   return result
