@@ -10,6 +10,8 @@ V1.2 2014-05-19
 
   * Sublime Text editor build system
 
+  * Dangling comments fix
+
 v1.1 2014-04-15  
 
   * CSS Minifier (--minify-css)

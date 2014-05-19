@@ -279,21 +279,24 @@ class a_cut( object ):
     
   def replace_preserving( me, indexeswithdata, merge = False ):
     """
-    For start,end,stringorcut in indexeswithdata:
+    For (start,end,stringorcut) in indexeswithdata:
       substitute start:end by stringorcut
+
     Update cut register for new positions !
-    If merge == True, merge cutregisters from string_or_cut (has to be cut)
+    If merge == True, merge cutregisters from string_or_cut (has to be a cut)
+    Delete comments between start:end.
     """
     if indexeswithdata:
       newstr = "" # substituted string, concatenated by iteration
       laststridx = 0 # pos of last character in string
       newcutreg = [] # updated cut register, constructed by iteration
       lastregidx = 0 # pos of last visited record in register
-      absolutregpos = 0 # absolute register position, because register keeps only relative 
-      # position from last record. 
+      absolutregpos = 0 # absolute register position, because register keeps only relative position from last record. 
 
       # following loop assumes indexeswithdata and cutregister are sorted!
       again = False # flag for visiting register record more than once 
+      afterremovefix = 0 # when removing comments
+
       for start,end,stringorcut in indexeswithdata:
         # SUBSTITUTE
         newstr += me.str[ laststridx : start ] + str(stringorcut)
@@ -305,25 +308,47 @@ class a_cut( object ):
         for cut in me.cutregister[lastregidx:]:
           if not again:
             absolutregpos += cut[0]
-          # condition to check if cut should be updated
+
+          if afterremovefix:
+            # TODO change tuples to something modifiable
+            cut = ( cut[0] + afterremovefix, cut[1] )
+            afterremovefix = 0
+
+          # Main condition to check if cut should be updated
           # it works because als cuts before are skipped in the 
           # "else" statement below
           if absolutregpos > start:
-            #how much substitute changed text
-            delta = len(str(stringorcut)) - (end-start) 
-            if not again:
-              # update register from oryginal
-              newcutreg.append(  ( cut[0] + delta, cut[1] )  )
-              again = True
+            if absolutregpos < end: 
+              # delete this register (together with content)
+              if again:
+                try:
+                  deleted = newcutreg.pop()
+                except IndexError:
+                  log_err ("COD internal error which never should happened")
+                  sys.exit(44542)
+                again = False
+              else:
+                deleted = cut
+              # fix next register
+              afterremovefix = deleted[0]
+              lastregidx += 1 # skip this record next iteration
+              continue # it's not needed, but for visibility
             else:
-              #update register alredy updated
-              newcutreg[-1] = ( newcutreg[-1][0] + delta, newcutreg[-1][1] )
-            if merge:
-              ( merged, newcutreg ) = me.merge_cutregister_when_replace(
-                stringorcut,
-                newcutreg,
-                newstr)
-            break
+              #how much substitute changed text
+              delta = len(str(stringorcut)) - (end-start) 
+              if not again:
+                # update register from oryginal
+                newcutreg.append(  ( cut[0] + delta, cut[1] )  )
+                again = True
+              else:
+                #update register alredy updated
+                newcutreg[-1] = ( newcutreg[-1][0] + delta, newcutreg[-1][1] )
+              if merge:
+                ( merged, newcutreg ) = me.merge_cutregister_when_replace(
+                  stringorcut,
+                  newcutreg,
+                  newstr)
+              break
           else:
             if not again:
               # copy record without updating. not needed
@@ -349,21 +374,7 @@ class a_cut( object ):
       # save str and register
       # We need to do it at the end because all indexes are from oryginal string
       me.str = newstr
-      #
-      me.cutregister = []
-      # TODO this should be changed to removing deleted comments. 
-      fixnext = 0 # fix next pos which is relative to previous 
-      for pos,data in newcutreg:
-        pos += fixnext
-        fixnext = 0
-        if pos < 0: # negative registers
-          # remove them
-          pass
-          # uncomment if we want to preserve negative comments
-          #me.cutregister.append( (0, data) )
-          fixnext = pos
-        else:
-          me.cutregister.append( (pos, data) )
+      me.cutregister = newcutreg
 
   def merge_cutregister_when_replace(
         me,
