@@ -36,7 +36,7 @@ Use mnemonics
       bac #1C6BA0
     }
 
-Common CSS keywords have mnemonics. Parameters are 3 letters long, values 2, and units just 1 letter ([List](http://www.cofoh.com/css-on-diet-1.1))
+Common CSS keywords have mnemonics. Parameters are 3 letters long, values 2, and units just 1 letter ([The list](http://www.cofoh.com/css-on-diet-1.2))
 
 One line comments
 -----------------
