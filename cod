@@ -401,12 +401,11 @@ class a_cut( object ):
 
       if mergecut:
         mergecut[0] = ( mergecut[0][0] + oldfilling, mergecut[0][1] )
-      
-      if not tail:
-        newcutreg = newcutreg[:-1] + mergecut + \
-          [ ( newcutreg[-1][0] - oldfilling - mergeabsolute, newcutreg[-1][1] ) ]
-      else:
-        newcutreg += mergecut
+        if not tail:
+          newcutreg = newcutreg[:-1] + mergecut + \
+            [ ( newcutreg[-1][0] - oldfilling - mergeabsolute, newcutreg[-1][1] ) ]
+        else:
+          newcutreg += mergecut
       
       result = True
     return ( result, newcutreg )

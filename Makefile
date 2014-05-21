@@ -8,8 +8,12 @@ DIST=cod version LICENSE README.md Changes
 VERSION=$(shell cat cod | grep -E '^VERSION *= *".*"' | grep -oE '[0-9\.]+')
 VERDIR=cod-$(VERSION)
 TARBALL=$(VERDIR).tgz
+SUBLIME_COD_COPY=sublimetext/cod.py
 
-all: test
+all: $(SUBLIME_COD_COPY) test
+
+$(SUBLIME_COD_COPY): cod
+	cp $< $@
 
 $(TARBALL): $(DIST)
 	@mkdir $(VERDIR)

@@ -1,3 +1,7 @@
+V1.3 2014-05-22
+
+  * Shifted comments fix for including file without comments
+
 V1.2 2014-05-19
 
   * Including and zipping COD and raw CSS files (@cod-includes)
