@@ -6,7 +6,7 @@
 }
 li {
   mal 200p
-  mal 200p+20
+  mal 200+20p
   mal 200p-20*3
   mal 200p-2**2
   mal 200p+300i

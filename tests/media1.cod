@@ -1,0 +1,30 @@
+//!cofoh.com/css-on-diet-1.2
+
+@cod-defines {
+  MYCAR 12p+3p
+  CAR (MYCAR)*2
+}
+li {
+  mal CAR
+}
+
+// This doesn't work
+@media screen and (miw: 58e) { // ERROR - NO EXPAND
+  li {
+    mal CAR+40
+  }
+}
+
+@media screen and (min-width: 75em) {
+  li {
+    mal CAR+60
+  }
+  @cod-include {
+    include1c.cod
+  }
+}
+
+
+  
+
+
