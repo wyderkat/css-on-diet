@@ -19,6 +19,8 @@ test_consume_strings() { one2one strings1; }
 test_include() { include1; }
 test_multipledefines() { one2one multipledefines; }
 test_media1() { one2one media1; }
+test_defines2mixin() { one2one defines2mixin; }
+test_real_buttons() { one2one real-buttons; }
 
 
 oneTimeSetUp()
@@ -53,9 +55,9 @@ assert_except_1st_line()
 
 switches()
 {
-  in=file.cod
-  out=file.result.css
-  expected=file.css
+  in=switches.cod
+  out=switches.result.css
+  expected=switches.css
 
   $COD $in -o $out
   assertSame "execution error" 0 $?

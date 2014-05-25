@@ -1,0 +1,13 @@
+@cod-defines {
+  Button pa- 10p; bac _ARG1_
+}
+
+.sleepy-button {
+  ma- 50p
+  Button( #A35B88 )
+}
+
+.hungry-button {
+  ma- 1p
+  Button( #346523 )
+}

@@ -1,0 +1,21 @@
+@import url("http://fonts/googleapis.com/css?family=Montserrat");
+
+@cod-defines {
+  Button-act .btn.btn-_ARG1_ { ba- _ARG2_; bos 0 3p 0 _ARG3_} .btn-_ARG1_:active { bos 0 1p 0 _ARG3_; pos re; top 2p }
+}
+
+.btn {
+  fof 'Montserrat'
+  tet up
+  pa- 10p
+  b-- no
+  tea ce
+  ou- no
+  cur po
+  col #fafafa
+}
+
+Button-act(awesome, #17805B, #000000)
+Button-act(bad, #5a5a5a, #000000)
+Button-act(cool, #6a598d, #000000)
+

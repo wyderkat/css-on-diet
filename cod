@@ -5,7 +5,7 @@
 # Licensed under GPL-v3
 ##
 VERSION = "1.3"
-PROToVERSION = "1.2"
+PROToVERSION = "1.3"
 
 PROPERTyMNEMONICS = {
   "col":"color",
@@ -204,6 +204,7 @@ import re
 import sys
 from os import path
 import hashlib
+
 
 def error_handler( msg ):
   pass
@@ -479,8 +480,8 @@ DEFINEsBLOCkRE = re.compile( r"""
   \s*
   {
   (.*?) # everything up to close
-  }
-                            """, re.X|re.S ) 
+  $\s* } \s*$    # has to be in separate line
+                            """, re.X|re.S|re.M ) 
 
 DEFINeNAMeCHAR = r"[-\w]"
 # TODO str supp
@@ -493,7 +494,9 @@ DEFINEsRE = re.compile( r"""
 
 class a_defines(object):
   def __init__( me ):
+    # define names pattern inside @cod-define
     me.dictin = {}
+    # outside - in real document
     me.dictout = {}
   def add_def( me, name, body ):
     pat1 = r"(?<!%s)" % DEFINeNAMeCHAR
@@ -536,15 +539,16 @@ DEFINeARGUMENT = re.compile( r"_ARG(\d+)_" )
 
 def expand_defines( defines, cutorstr ):
   if type( cutorstr ) == type( "" ):
-    cut = False
+    outside = False
   else:
-    cut = True
+    outside = True
   
-  for defbody,defpat in defines.get_all( cut ):
+  for defbody,defpat in defines.get_all( outside ):
 
     defcandidate = re.finditer( defpat, str(cutorstr) )
     tocutit = []
     for d in defcandidate:
+      newbody = defbody
       # find arguments 
       argumentsstring = d.group(1)
       arguments = []
@@ -554,15 +558,15 @@ def expand_defines( defines, cutorstr ):
           arguments.append( a.strip() )
       # apply arguments
       if arguments:
-        defbody = DEFINeARGUMENT.sub( 
+        newbody = DEFINeARGUMENT.sub( 
           lambda x: expand_argument(arguments,x,defbody), defbody )
 
-      if cut:
+      if outside:
         tocutit.append( ( d.start(), 
                           d.end(), 
-                          defbody ) )
-      else: # cut object
-        cutorstr = cutorstr[:d.start()] + defbody + cutorstr[d.end():]
+                          newbody ) )
+      else: # inside define block
+        cutorstr = cutorstr[:d.start()] + newbody + cutorstr[d.end():]
 
     if tocutit:
       cutorstr.replace_preserving( tocutit )

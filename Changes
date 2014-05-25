@@ -1,6 +1,10 @@
 V1.3 2014-05-22
 
+  * Support for {} inside defines 
+
   * Shifted comments fix for including file without comments
+
+  * Mixins fix for multiple calls
 
 V1.2 2014-05-19
 
