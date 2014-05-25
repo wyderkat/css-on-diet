@@ -21,8 +21,12 @@ $(TARBALL): $(DIST)
 	@tar cfz $@ $(VERDIR)
 	@rm -r $(VERDIR)
 
-test: $(TARBALL)
-	@cd tests && bash regression $(TARBALL) $(VERDIR)
+test: test2.7 test3.3
+
+test%: $(TARBALL)
+	@echo "\nExecuting $@\n"
+	@cd tests && bash regression $(TARBALL) $(VERDIR) python$(subst test,,$@)
+
 
 # make_version has to be first
 dist: make_version $(TARBALL)

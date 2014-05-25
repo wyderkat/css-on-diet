@@ -6,6 +6,8 @@ TARBALL=$1
 shift
 VERDIR=$1
 shift
+PYTHON=$1
+shift
 
 test_application_start() { application_start; }
 test_switches() { switches; }
@@ -28,7 +30,7 @@ oneTimeSetUp()
   COD_TMP_DIR=`mktemp -d --tmpdir cod-XXX`
   tar xfz ../$TARBALL -C "$COD_TMP_DIR" #> /dev/null
   COD_DIR="$COD_TMP_DIR/$VERDIR"
-  COD="$COD_DIR"/cod
+  COD="$PYTHON $COD_DIR/cod"
 }
 
 oneTimeTearDown()
