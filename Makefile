@@ -27,12 +27,14 @@ test%: $(TARBALL)
 	@cd tests && bash regression $(TARBALL) $(VERNAME) python$(subst test,,$@)
 
 
-pub: cofoh pypi sublime
-
+pub: 
+	@git push github master --tags
 cofoh: $(TARBALL)
 	scp $^ Cofoh:cofoh/f/
 pypi: $(DIST)
 	python setup.py sdist upload
+pypiinfo: 
+	python setup.py register
 sublime: $(SUBLIME_COD_COPY)
 	@cd sublimetext; git commit && git push github master --tags
 
@@ -41,4 +43,4 @@ $(SUBLIME_COD_COPY): CSSOnDiet/cod.py
 
 
 
-.PHONY: clean test dist d all cofoh pypi sublime pub
+.PHONY: clean test dist d all cofoh pypi pypiinfo sublime pub
