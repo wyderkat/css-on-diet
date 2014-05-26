@@ -109,10 +109,21 @@ Mixins
 Mixins are defines with arguments. Easy to use but powerful syntax.
 
 
-Installation from TGZ file
-==========================
+Installation
+============
 
-Unpack TGZ file and *cod* Python script is all you need. 
+Actually, in the current version *cod.py* is the only file you need it. 
+Of course you need [Python](http://www.python.org) to launch it. 
+Note that in the proper installation *cod* script is a copy of *cod.py*.
 
-Install Python (ver 2.7.x preferable) if you don't have it.
+To perform proper installation you have following choices:
+
+1. Use/install [pip](https://pip.pypa.io/en/latest/installing.html) 
+and type `pip install CSSOnDiet` (that will download and install CSSOnDiet 
+from [pypi](https://pypi.python.org/pypi))
+2. Download archive from [CSS-On-Diet website](http://cofoh.com/css-on-diet), 
+unpack it and run `python setup.py install`
+3. Or clone [this](http://github.com/wyderkat/css-on-diet) github repo 
+and run also `python setup.py install` from it.
+
 

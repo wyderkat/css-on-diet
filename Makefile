@@ -4,42 +4,41 @@
 # Licensed under GPL-v3
 ##
 
-DIST=cod version LICENSE README.md Changes
+DIST=CSSOnDiet/cod.py setup.py LICENSE README.md Changes
+
 VERSION=$(shell cat cod | grep -E '^VERSION *= *".*"' | grep -oE '[0-9\.]+')
-VERDIR=cod-$(VERSION)
-TARBALL=$(VERDIR).tgz
+VERNAME=CSSOnDiet-$(VERSION)
+TARBALL=dist/$(VERNAME).tar.gz
 SUBLIME_COD_COPY=sublimetext/cod.py
 
 all: $(SUBLIME_COD_COPY) test
 
-$(SUBLIME_COD_COPY): cod
-	cp $< $@
-
 $(TARBALL): $(DIST)
-	@mkdir $(VERDIR)
-	@cp $^ $(VERDIR)
-	@tar cfz $@ $(VERDIR)
-	@rm -r $(VERDIR)
+	@python setup.py sdist >/dev/null
+dist: $(TARBALL)
+
+d: $(TARBALL)
+
 
 test: test2.7 test3.3
 
 test%: $(TARBALL)
 	@echo "\nExecuting $@\n"
-	@cd tests && bash regression $(TARBALL) $(VERDIR) python$(subst test,,$@)
+	@cd tests && bash regression $(TARBALL) $(VERNAME) python$(subst test,,$@)
 
 
-# make_version has to be first
-dist: make_version $(TARBALL)
-
-d: $(TARBALL)
+pub: cofoh pypi sublime
 
 cofoh: $(TARBALL)
 	scp $^ Cofoh:cofoh/f/
+pypi: $(DIST)
+	python setup.py sdist upload
+sublime: $(SUBLIME_COD_COPY)
+	@cd sublimetext; git commit && git push github master --tags
 
-pub: cofoh
+$(SUBLIME_COD_COPY): CSSOnDiet/cod.py
+	@cp $< $@
 
 
-make_version:
-	@./wyderkat/versioning.py
 
-.PHONY: clean test dist all make_version cofoh pub
+.PHONY: clean test dist d all cofoh pypi sublime pub
