@@ -4,7 +4,7 @@
 #  www.cofoh.com
 # Licensed under GPL-v3
 ##
-VERSION = "1.3"
+VERSION = "1.3.1"
 PROToVERSION = "1.3"
 
 PROPERTyMNEMONICS = {
