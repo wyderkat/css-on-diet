@@ -966,19 +966,20 @@ def include_files_recursiv( filename, included_sha1 ):
 
 if __name__ == "__main__":
 
-  import argparse
-  parser = argparse.ArgumentParser(
-    description=
-"""CSS On Diet
-===========
-Preprocessor for CSS files.
--------------------------
-www.cofoh.com/css-on-diet""",
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-  )
+  try:
+    import argparse
+    optmode = False
+  except:
+    # python2.6 dependency
+    import optparse as argparse
+    optmode = True
+    argparse.ArgumentParser = argparse.OptionParser
+    argparse.ArgumentParser.add_argument = argparse.ArgumentParser.add_option
 
-  parser.add_argument('cod_files', metavar='file.cod', nargs="+",
-                      help='Css-on-diet file list to process')
+  parser = argparse.ArgumentParser(
+    description= "CSS-On-Diet - preprocessor for CSS files",
+    epilog="www.cofoh.com/css-on-diet"
+  )
 
   parser.add_argument(
     '-o', '--output', metavar="output.css",
@@ -998,7 +999,14 @@ www.cofoh.com/css-on-diet""",
     help="Minify CSS result code. Implies --no-comments and --no-header"
   )
   # FINISH
-  args = parser.parse_args()
+  if not optmode:
+    parser.add_argument('cod_files', metavar='file.cod', nargs="+",
+                        help='CSS-On-Diet file to preprocess. Files are joined if more than one given.')
+    args = parser.parse_args()
+  else:
+    (args, leftargs) = parser.parse_args()
+    args.cod_files = leftargs
+    
   if args.minify_css:
     args.no_comments = True
     args.no_header = True

@@ -30,9 +30,6 @@ setup(
     ('share/doc/CSSOnDiet', ['Changes','LICENSE','README.md'])
   ],
 
-  #install_requires = ['argparse'],
-  requires = ['argparse'],
-
   url='http://www.cofoh.com/css-on-diet',
   author='Tomasz Wyderka',
   author_email='wyderkat@cofoh.com',
