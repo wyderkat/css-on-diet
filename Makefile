@@ -36,7 +36,7 @@ pypi: $(DIST)
 pypiinfo: 
 	python setup.py register
 sublime: $(SUBLIME_COD_COPY)
-	@cd sublimetext; git commit && git push github master --tags
+	@cd sublimetext; git commit -a && git push github master --tags
 
 $(SUBLIME_COD_COPY): CSSOnDiet/cod.py
 	@cp $< $@
