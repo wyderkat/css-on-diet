@@ -73,7 +73,7 @@ one2one()
   out=$1.result.css
   expected=$1.css
 
-  $COD $in > $out
+  $COD $in > $out 2> /dev/null
 
   assertSame "execution error" 0 $?
 
@@ -94,7 +94,7 @@ include1()
   out=include1.result.css
   expected=include1.css
 
-  $COD $in > $out
+  $COD $in > $out 2> /dev/null
 
   assertSame "execution error" 0 $?
 

@@ -1,3 +1,7 @@
+V1.4 2014-05-30
+
+  * Arythmethics division independend from python version
+
 V1.3 2014-05-25
 
   * Support for {} inside defines 

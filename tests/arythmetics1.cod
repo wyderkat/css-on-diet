@@ -16,6 +16,7 @@ li {
   mal 20+4 4+4 // one space separator
   mal 21/5  // integer division
   mal 21/5.00 // floats
+  mal 21.0/5 // floats
 }
 
 

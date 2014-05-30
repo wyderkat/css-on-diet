@@ -4,6 +4,8 @@
 #  www.cofoh.com
 # Licensed under GPL-v3
 ##
+from __future__ import division # for python2-3 compatibility
+
 VERSION = "1.3.2"
 PROToVERSION = "1.3"
 
@@ -204,6 +206,7 @@ import re
 import sys
 from os import path
 import hashlib
+import math
 
 
 def error_handler( msg ):
@@ -628,6 +631,9 @@ def reduce_arithmetic( cut ):
       result = eval(expr, {})
     except SyntaxError:
       continue
+    if "." not in expr:
+      result = math.trunc( result )
+
     resultstr = str(result)
     if unit:
       resultstr += unit
