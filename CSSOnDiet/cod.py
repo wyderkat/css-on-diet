@@ -6,7 +6,7 @@
 ##
 from __future__ import division # for python2-3 compatibility
 
-VERSION = "1.3.2"
+VERSION = "1.3.3"
 PROToVERSION = "1.3"
 
 PROPERTyMNEMONICS = {
@@ -625,7 +625,7 @@ def reduce_arithmetic( cut ):
   for a in arith:
     astr = a.group(1)
     if not ARITHMETIcAtLEAStTWoRE.search( astr ):
-      continue # at least one operator and digit to be arythmetic expression
+      continue # at least one operator and digit to be arithmetic expression
     ( expr, unit ) = get_arithmetic_units( astr )
     try:
       result = eval(expr, {})
