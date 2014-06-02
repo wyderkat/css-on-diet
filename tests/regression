@@ -20,10 +20,11 @@ test_file_formats() { file_formats; }
 test_rgba() { one2one rgba1; }
 test_consume_strings() { one2one strings1; }
 test_include() { include1; }
+test_include_dirs() { include_dirs; }
 test_multipledefines() { one2one multipledefines; }
 test_media1() { one2one media1; }
 test_defines2mixin() { one2one defines2mixin; }
-test_real_buttons() { one2one real-buttons; }
+test_user_buttons() { one2one user-buttons; }
 
 
 oneTimeSetUp()
@@ -113,6 +114,19 @@ include1()
   assert_except_1st_line $expected $out
 }
 
+
+include_dirs()
+{
+  in="include1dir.cod include1Z.cod"
+  out=include1.result.css
+  expected=include1.css
+
+  $COD -I.. $in > $out 2> /dev/null
+
+  assertSame "execution error" 0 $?
+
+  assert_except_1st_line $expected $out
+}
 
 
 

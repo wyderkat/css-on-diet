@@ -897,7 +897,7 @@ def put_css_on_diet( a, error_handler ):
   included_sha1 = []
   nlcharacterlist = [ ]
   for filename in a.cod_files:
-    incontentcut, innlcharacter = include_files_recursiv ( filename, included_sha1 )
+    incontentcut, innlcharacter = include_files_recursiv ( a, filename, included_sha1 )
     if incontentcut == None:
       continue
     nlcharacterlist.append( innlcharacter )
@@ -930,25 +930,29 @@ def put_css_on_diet( a, error_handler ):
   if handleout is not sys.stdout:
     handleout.close()
 
-def include_files_recursiv( filename, included_sha1 ):
-  try:
-    if filename == "-":
-      content = sys.stdin.read()
-      directory = "" # current path
-      nlcharacterlist = [ "\n" ]
-    else:
-      with open(filename, "U") as fh:
-        directory = path.dirname( path.realpath( filename ) )
-        content = fh.read()
-        nlcharacterlist = [ get_nlcharacter( fh ) ]
-  except IOError as e:
-    log_err( "I have problem including '%s' file. Exception '%s'.\n" \
-        % ( str(filename), str(e.strerror) ) )
-    raise a_preprocess_error( 111 )
-  except Exception as e:
-    log_err( "I have weird problem probably with '%s' file. Exception '%s'.\n" \
-        % ( str(filename), str(e) ) )
-    raise a_preprocess_error( 32 )
+def include_files_recursiv( a, filename, included_sha1 ):
+  if filename == "-":
+    content = sys.stdin.read()
+    directory = "" # current path
+    nlcharacterlist = [ "\n" ]
+  else:
+    if not path.exists( filename ):
+      log_err( "File \"%s\" can't be preprocess because it doesn't exist\n"
+          % ( str(filename) ) ) 
+      raise a_preprocess_error( 63 )
+    try:
+        with open(filename, "U") as fh:
+          directory = path.dirname( path.realpath( filename ) )
+          content = fh.read()
+          nlcharacterlist = [ get_nlcharacter( fh ) ]
+    except IOError as e:
+      log_err( "I have problem reading '%s' file. Exception '%s'.\n" \
+          % ( str(filename), str(e.strerror) ) )
+      raise a_preprocess_error( 111 )
+    except Exception as e:
+      log_err( "I have weird problem probably with '%s' file. Exception '%s'.\n" \
+          % ( str(filename), str(e) ) )
+      raise a_preprocess_error( 32 )
 
   #
   sha1 = hashlib.sha1()
@@ -964,9 +968,19 @@ def include_files_recursiv( filename, included_sha1 ):
   rm_comments( contentcut )
   tomerge = []
   for infile, position in find_includes( contentcut ):
-    #print ">>> infile=%s at position=%d in %s" % ( infile, position, filename )
-    infile = path.join( directory, infile )
-    (incontentcut, innlcharacter) = include_files_recursiv ( infile, included_sha1 )
+    alldirs = [directory] + a.include_dirs
+    for dir in alldirs:
+      inabsfile = path.join( dir, infile )
+      if path.exists( inabsfile ):
+        break
+    else:
+      # this is only for included files, so it is not at the top of this function
+      log_err( "File \"%s\" can't be included because it doesn't exist" \
+      " in any of these directories: %s\n" \
+          % ( str(infile), str(alldirs) ) )
+      raise a_preprocess_error( 67 )
+
+    (incontentcut, innlcharacter) = include_files_recursiv ( a, inabsfile, included_sha1 )
     if incontentcut == None:
       continue
     nlcharacterlist.append( innlcharacter )
@@ -1009,6 +1023,10 @@ if __name__ == "__main__":
     '-m', '--minify-css',  action="store_true",
     help="Minify CSS result code. Implies --no-comments and --no-header"
   )
+  parser.add_argument(
+    '-I', '--include-dirs', metavar='dir[,dir...]', 
+    help="List of additional directories to look for included files. Separtor is the comma sign."
+  )
   # FINISH
   if not optmode:
     parser.add_argument('cod_files', metavar='file.cod', nargs="+",
@@ -1032,6 +1050,14 @@ if __name__ == "__main__":
   if args.minify_css:
     args.no_comments = True
     args.no_header = True
+
+  if args.include_dirs:
+    args.include_dirs = args.include_dirs.split(",")
+  else:
+    args.include_dirs = [] # more useful than None
+
+  args.include_dirs = map( path.abspath, args.include_dirs )
+
 
   try:
     put_css_on_diet( args, sys.stderr.write )

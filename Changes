@@ -4,6 +4,8 @@ V1.4 2014-05-30
 
   * Read STDIN when "-" instead of file
 
+  * -I (--include-dirs) switch
+
 V1.3 2014-05-25
 
   * Support for {} inside defines 

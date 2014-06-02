@@ -22,6 +22,8 @@ d: $(TARBALL)
 
 test: test2.7 test2.6 test3.3 
 
+t: test2.7
+
 test%: $(TARBALL)
 	@echo "\nExecuting $@\n"
 	@cd tests && bash regression $(TARBALL) $(VERNAME) python$(subst test,,$@)
