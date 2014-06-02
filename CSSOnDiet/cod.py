@@ -6,7 +6,7 @@
 ##
 from __future__ import division # for python2-3 compatibility
 
-VERSION = "1.3.4"
+VERSION = "1.3.5"
 PROToVERSION = "1.3"
 
 PROPERTyMNEMONICS = {
