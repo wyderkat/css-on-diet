@@ -6,7 +6,7 @@
 ##
 from __future__ import division # for python2-3 compatibility
 
-VERSION = "1.3.3"
+VERSION = "1.3.4"
 PROToVERSION = "1.3"
 
 PROPERTyMNEMONICS = {
@@ -1056,7 +1056,7 @@ if __name__ == "__main__":
   else:
     args.include_dirs = [] # more useful than None
 
-  args.include_dirs = map( path.abspath, args.include_dirs )
+  args.include_dirs = list( map( path.abspath, args.include_dirs ) )
 
 
   try:
