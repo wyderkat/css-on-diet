@@ -328,7 +328,7 @@ class a_cut( object ):
                   deleted = newcutreg.pop()
                 except IndexError:
                   log_err ("COD internal error which never should happened\n")
-                  sys.exit(44542)
+                  sys.exit(42)
                 again = False
               else:
                 deleted = cut
@@ -932,18 +932,23 @@ def put_css_on_diet( a, error_handler ):
 
 def include_files_recursiv( filename, included_sha1 ):
   try:
-    with open(filename, "U") as fh:
-      directory = path.dirname( path.realpath( filename ) )
-      content = fh.read()
-      nlcharacterlist = [ get_nlcharacter( fh ) ]
+    if filename == "-":
+      content = sys.stdin.read()
+      directory = "" # current path
+      nlcharacterlist = [ "\n" ]
+    else:
+      with open(filename, "U") as fh:
+        directory = path.dirname( path.realpath( filename ) )
+        content = fh.read()
+        nlcharacterlist = [ get_nlcharacter( fh ) ]
   except IOError as e:
     log_err( "I have problem including '%s' file. Exception '%s'.\n" \
         % ( str(filename), str(e.strerror) ) )
-    raise a_preprocess_error( 11 )
+    raise a_preprocess_error( 111 )
   except Exception as e:
     log_err( "I have weird problem probably with '%s' file. Exception '%s'.\n" \
         % ( str(filename), str(e) ) )
-    raise a_preprocess_error( 12 )
+    raise a_preprocess_error( 32 )
 
   #
   sha1 = hashlib.sha1()
@@ -1007,11 +1012,22 @@ if __name__ == "__main__":
   # FINISH
   if not optmode:
     parser.add_argument('cod_files', metavar='file.cod', nargs="+",
-                        help='CSS-On-Diet file to preprocess. Files are joined if more than one given.')
+                        help='CSS-On-Diet file to preprocess.' +
+                        ' Multiple files are joined.' +
+                        ' If "-" given read from STDIN instead of file.')
     args = parser.parse_args()
   else:
     (args, leftargs) = parser.parse_args()
     args.cod_files = leftargs
+
+  stdinasfile = 0
+  for f in args.cod_files:
+    if f == "-":
+      stdinasfile += 1
+
+  if stdinasfile > 1:
+    sys.stderr.write("Only one file can be STDIN (don't use hyphen more than once)\n")
+    sys.exit(175)
     
   if args.minify_css:
     args.no_comments = True

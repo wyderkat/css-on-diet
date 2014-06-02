@@ -11,6 +11,7 @@ shift
 
 test_application_start() { application_start; }
 test_switches() { switches; }
+test_switches_stdin() { switches_stdin; }
 test_preserve_comments1() { one2one comments1; }
 test_defines1() { one2one defines1; }
 test_header1() { one2one header1; }
@@ -62,6 +63,17 @@ switches()
   expected=switches.css
 
   $COD $in -o $out
+  assertSame "execution error" 0 $?
+  assert_except_1st_line $expected $out
+}
+
+switches_stdin()
+{
+  in=-
+  out=stdin.result.css
+  expected=stdin.css
+
+  echo "@cod-include{include1c.cod} li{fos 10p}" | $COD $in -o $out
   assertSame "execution error" 0 $?
 
   assert_except_1st_line $expected $out

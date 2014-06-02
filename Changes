@@ -2,6 +2,8 @@ V1.4 2014-05-30
 
   * Arithmetics division independent from python version
 
+  * Read STDIN when "-" instead of file
+
 V1.3 2014-05-25
 
   * Support for {} inside defines 
