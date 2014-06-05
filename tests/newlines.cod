@@ -1,0 +1,17 @@
+@cod-defines {
+  mixin bac orange ;\
+        pa- 10p
+  Olamix \
+    bac orange ;\
+    pa- 11p
+}
+li {
+  bai linear-gradient( to right, 
+     white, #F45632
+     )
+  bai linear-gradient( to right, \
+     white, #F45632 \
+     )
+  mixin
+  Olamix
+}
