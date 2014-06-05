@@ -497,10 +497,14 @@ DEFINEsRE = re.compile( r"""
 
 class a_defines(object):
   def __init__( me ):
-    # define names pattern inside @cod-define
-    me.dictin = {}
-    # outside - in real document
-    me.dictout = {}
+    # list of 
+    #(name, body, pat_in, pat_out)
+    # where pat_in is pattern maching name
+    # to use inside @cod-define
+    # pat_out - everywhere outside
+    # This list is sorted with longer at the front
+    # to avoid substring substitutions inside @cod-defines
+    me.db = []
   def add_def( me, name, body ):
     pat1 = r"(?<!%s)" % DEFINeNAMeCHAR
     pat2 = re.escape( name ) 
@@ -510,13 +514,18 @@ class a_defines(object):
     patin = re.compile( pat2 + pat4 ) 
     patout = re.compile( pat1 + pat2 + pat3 + pat4 ) 
 
-    me.dictin[name] = (body, patin)
-    me.dictout[name] = (body, patout)
+    i = 0
+    while i< len(me.db):
+      if len(name) >= len(me.db[i][0]):
+        break
+      i += 1
+    me.db.insert(i, (name, body, patin, patout) )
+
   def get_all(me, out):
     if out:
-      return me.dictout.values()
+      return map( lambda x: (x[3],x[1]) , me.db )
     else:
-      return me.dictin.values()
+      return map( lambda x: (x[2],x[1]) , me.db )
 
 def read_defines( cut ):
   defines = a_defines()
@@ -546,7 +555,7 @@ def expand_defines( defines, cutorstr ):
   else:
     outside = True
   
-  for defbody,defpat in defines.get_all( outside ):
+  for defpat,defbody in defines.get_all( outside ):
 
     defcandidate = re.finditer( defpat, str(cutorstr) )
     tocutit = []
