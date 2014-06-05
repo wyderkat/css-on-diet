@@ -5,6 +5,8 @@ V1.4 2014-05-30
   * Read STDIN when "-" instead of file
 
   * -I (--include-dirs) switch
+  
+  * New lines escapes ( \\\n )
 
 V1.3 2014-05-25
 

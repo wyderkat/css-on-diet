@@ -20,7 +20,7 @@ dist: $(TARBALL)
 d: $(TARBALL)
 
 
-test: test2.7 test2.6 test3.3 
+test: test2.7 test2.6 test3.2 test3.3 test3.4 
 
 t: test2.7
 

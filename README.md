@@ -99,14 +99,15 @@ Mixins
 
     @cod-defines {
       sp2014 3p-1
-      ocean #1C6BA0_ARG1_
+      ocean bac #1C6BA0_ARG1_ ;\
+            bai url("fish.png")
     }
     .element {
       les sp2014
-      bac ocean(F1)
+      ocean(F1)
     }
 
-Mixins are defines with arguments. Easy to use but powerful syntax.
+Mixins can be anything placed anywhere. Arguments give them programming power.
 
 
 Installation
