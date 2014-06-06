@@ -240,6 +240,10 @@ class a_cut( object ):
   def set_str( me, str ):
     me.str = str
 
+  # it has to preserve cut register
+  def append( me, str ):
+    me.str += str
+
   def cut_and_save( me, indexes ):
     """ 
     cut data (like comments) and save them in register for later recover
@@ -593,6 +597,116 @@ def expand_argument( arguments, matchobject, body ):
     log_err( "Missing argument for define: '%s'\n" % body ) 
     return ""
 
+MEDIaBLOCkRE = re.compile( r"""
+  @cod-medias?
+  \s*
+  {
+  (.*?) # everything up to close
+  }
+                            """, re.X|re.S|re.M ) 
+
+MEDIaNAMeCHAR = DEFINeNAMeCHAR
+# TODO str supp
+MEDIaRe = re.compile( r"""
+  (?P<name>%s+)   # some freedom in naming
+  [ \t\r\f\v]*       # not \n! can be empty when no body
+  (?P<body>.*?)      # can be empty
+  $                  # end of line or text
+                       """ % MEDIaNAMeCHAR, re.X|re.M ) 
+
+# TODO common base class for a_medias and a_defines
+class a_media(object):
+  def __init__( me ):
+    # list of 
+    # (name, body, @name)
+    # where @name is word to find 
+    # This list is sorted with longer at the front
+    # to avoid substring substitutions inside @cod-medias
+    me.db = []
+  def add_media( me, name, body ):
+    i = 0
+    while i< len(me.db):
+      if len(name) >= len(me.db[i][0]):
+        break
+      i += 1
+    me.db.insert(i, (name, body, "@"+name) )
+
+  def find_index( me, atname ):
+    index = 0
+    for name,body,at in me.db:
+      if atname == at:
+        return index
+      index += 1
+    return None
+  def get_bodies( me ):
+    return map( lambda x: x[1], me.db) 
+
+def read_media( cut ):
+  media = a_media()
+  blocks = MEDIaBLOCkRE.finditer( str(cut) )
+  to_replace = []
+  for b in blocks:
+    mediasblock = b.group(1)
+    to_replace.append( ( b.start(), b.end(), "" ) )
+
+    mediamatch = MEDIaRe.finditer( mediasblock )
+    for m in mediamatch:
+      name = m.group("name") 
+      body = m.group("body")
+      # self expand
+      # Not for media # body = expand_defines( media, body )
+      #
+      media.add_media( name, body )
+  cut.replace_preserving( to_replace )
+  return media
+
+def move_media( media, cut ):
+
+  sets = SEtRE.finditer( str(cut) )
+  toreplace = [] # has to be ordered
+  saved = [] # structure of tables and tuples 
+             # cannot use OrderedDict because python2.6
+  for m in media.get_bodies():
+    saved.append( (m, []) )
+  for s in sets:
+    
+    selector = s.group(1)
+    rules = RULeRE.finditer( str(cut), s.start(2), s.end(2) )
+    for rule in rules:
+
+      value = rule.group("value")
+      splitted = value.split()
+      if len(splitted)>0:
+        idx = media.find_index( splitted[-1] )
+        if idx != None:
+          decla = rule.group().replace( splitted[-1], "" ) # remove @medianame
+          for ruleselector, declarations in saved[idx][1]:
+            if ruleselector == selector:
+              declarations.append( decla )
+              break
+          else:
+            saved[idx][1].append( ( selector, [ decla ] ) )
+          toreplace.append( ( rule.start(), 
+                              rule.end(), 
+                              "" ) )
+  cut.replace_preserving( toreplace )
+
+  out = ""
+  for mediabody, rules in saved:
+    out += "@media %s {\n" % mediabody
+    for ruleselector, declarations in rules:
+      out += "%s {\n" % ruleselector
+      for decla in declarations:
+        out += "%s" % decla
+      out += "}\n" 
+    out += "}\n" 
+
+  cut.append( out )
+
+
+      
+
+
 # string support
 ARITHMETIcRE = re.compile( r"""
     \s          # has to be sourrounded by white characters
@@ -711,6 +825,7 @@ STRINgSUBRE = r"""
 """
 
 SEtRE = re.compile( r"""
+\s*([^;{}]+)\s*  # selector 
 {
   (  # main body
     (?:
@@ -743,7 +858,7 @@ def put_on_diet( cut ):
   abbmatch = [] # has to be ordered
   for s in sets:
 
-    rules = RULeRE.finditer( str(cut), s.start(1), s.end(1) )
+    rules = RULeRE.finditer( str(cut), s.start(2), s.end(2) )
     for rule in rules:
 
       if rule.group("param") in PROPERTyMNEMONICS:
@@ -920,6 +1035,8 @@ def put_css_on_diet( a, error_handler ):
   definesdict = read_defines( contentcut )
   expand_defines( definesdict, contentcut )
   reduce_arithmetic( contentcut )
+  medias = read_media( contentcut )
+  move_media( medias, contentcut )
   put_on_diet( contentcut )
   expand_rgba( contentcut )
 

@@ -26,6 +26,7 @@ test_media1() { one2one media1; }
 test_defines2mixin() { one2one defines2mixin; }
 test_user_buttons() { one2one user-buttons; }
 test_newlines() { one2one newlines; }
+test_media2() { one2one media2; }
 
 
 oneTimeSetUp()

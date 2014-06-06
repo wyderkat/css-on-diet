@@ -1,0 +1,27 @@
+@cod-media {
+  medium screen and (min-width: 32em) 
+  big screen and (min-width: BIGVALUE) 
+}
+
+@cod-define {
+  BIGVALUE 75em
+}
+
+li {
+  ma- 10p
+  ma- 20p @medium
+  ma- 30p @big
+  pa- 1e
+  pa- 2e @big
+  bac wh @medium; les 10p }
+
+ul {
+  pa- 3p @medium
+  pa- 4p @big
+}
+
+@media screen and (min-width: 32em) {
+  ul {
+    ma- 5p
+  }
+}

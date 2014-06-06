@@ -1,3 +1,7 @@
+V1.5 2014-06-07
+
+  * @media inline breakpoints 
+
 V1.4 2014-06-05
 
   * Arithmetics division independent from python version
