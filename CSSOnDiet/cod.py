@@ -620,16 +620,12 @@ class a_media(object):
     # list of 
     # (name, body, @name)
     # where @name is word to find 
-    # This list is sorted with longer at the front
-    # to avoid substring substitutions inside @cod-medias
     me.db = []
   def add_media( me, name, body ):
-    i = 0
-    while i< len(me.db):
-      if len(name) >= len(me.db[i][0]):
-        break
-      i += 1
-    me.db.insert(i, (name, body, "@"+name) )
+    me.db.append( (name, body, "@"+name) )
+
+  def empty( me ):
+    return len(me.db) == 0
 
   def find_index( me, atname ):
     index = 0
@@ -662,46 +658,49 @@ def read_media( cut ):
 
 def move_media( media, cut ):
 
-  sets = SEtRE.finditer( str(cut) )
-  toreplace = [] # has to be ordered
-  saved = [] # structure of tables and tuples 
-             # cannot use OrderedDict because python2.6
-  for m in media.get_bodies():
-    saved.append( (m, []) )
-  for s in sets:
-    
-    selector = s.group(1)
-    rules = RULeRE.finditer( str(cut), s.start(2), s.end(2) )
-    for rule in rules:
+  if not media.empty():
 
-      value = rule.group("value")
-      splitted = value.split()
-      if len(splitted)>0:
-        idx = media.find_index( splitted[-1] )
-        if idx != None:
-          decla = rule.group().replace( splitted[-1], "" ) # remove @medianame
-          for ruleselector, declarations in saved[idx][1]:
-            if ruleselector == selector:
-              declarations.append( decla )
-              break
-          else:
-            saved[idx][1].append( ( selector, [ decla ] ) )
-          toreplace.append( ( rule.start(), 
-                              rule.end(), 
-                              "" ) )
-  cut.replace_preserving( toreplace )
+    sets = SEtRE.finditer( str(cut) )
+    toreplace = [] # has to be ordered
+    saved = [] # structure of tables and tuples 
+               # cannot use OrderedDict because python2.6
+    for m in media.get_bodies():
+      saved.append( (m, []) )
+    # TODO faster would be just look for lines with @mediabreakpoints
+    for s in sets:
+      
+      selector = s.group(1)
+      rules = RULeRE.finditer( str(cut), s.start(2), s.end(2) )
+      for rule in rules:
 
-  out = ""
-  for mediabody, rules in saved:
-    out += "@media %s {\n" % mediabody
-    for ruleselector, declarations in rules:
-      out += "%s {\n" % ruleselector
-      for decla in declarations:
-        out += "%s" % decla
+        value = rule.group("value")
+        splitted = value.split()
+        if len(splitted)>0:
+          idx = media.find_index( splitted[-1] )
+          if idx != None:
+            decla = rule.group().replace( splitted[-1], "" ) # remove @medianame
+            for ruleselector, declarations in saved[idx][1]:
+              if ruleselector == selector:
+                declarations.append( decla )
+                break
+            else:
+              saved[idx][1].append( ( selector, [ decla ] ) )
+            toreplace.append( ( rule.start(), 
+                                rule.end(), 
+                                "" ) )
+    cut.replace_preserving( toreplace )
+
+    out = ""
+    for mediabody, rules in saved:
+      out += "@media %s {\n" % mediabody
+      for ruleselector, declarations in rules:
+        out += "%s {\n" % ruleselector
+        for decla in declarations:
+          out += "%s" % decla
+        out += "}\n" 
       out += "}\n" 
-    out += "}\n" 
 
-  cut.append( out )
+    cut.append( out )
 
 
       
@@ -838,6 +837,7 @@ SEtRE = re.compile( r"""
 """ % STRINgSUBRE, re.S | re.X ) 
 
 RULeRE = re.compile( r"""
+\s*   # consume all white space (only for @cod-media?)
 (?P<param>[\w\-]+) # parameter
 (?P<sep>[\s:]+) # optional separator
 (?P<value>
