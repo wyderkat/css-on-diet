@@ -252,6 +252,11 @@ class a_cut( object ):
   def append( me, str ):
     me.str += str
 
+  def register_append( me, str ):
+    (afterlastcut, _) =  me.last_cut_dinstances()
+    me.cutregister.append( ( afterlastcut, str ) )
+
+
   def cut_and_save( me, indexes ):
     """ 
     cut data (like comments) and save them in register for later recover
@@ -649,8 +654,8 @@ class a_media(object):
         return index
       index += 1
     return None
-  def get_bodies( me ):
-    return map( lambda x: x[1], me.db) 
+  def get_breakpoints( me ):
+    return map( lambda x: (x[0],x[1]), me.db) 
 
 def read_media( cut ):
   media = a_media()
@@ -680,8 +685,8 @@ def move_media( media, cut ):
     saved = [] # selected @media to place at the end of file
                # structure of tables and tuples 
                # cannot use OrderedDict because python2.6
-    for b in media.get_bodies():
-      saved.append( (b, []) )
+    for n,b in media.get_breakpoints():
+      saved.append( (n, b, []) )
 
     # faster would be just look for lines with @mediabreakpoints
     # but how to get selector then?
@@ -697,28 +702,27 @@ def move_media( media, cut ):
           idx = media.find_index( splitted[-1] )
           if idx != None:
             decla = d.group().replace( splitted[-1], "" ) # remove @medianame
-            for selectorsaved, declarationssaved in saved[idx][1]:
+            for selectorsaved, declarationssaved in saved[idx][2]:
               if selectorsaved == selector:
                 declarationssaved.append( decla )
                 break
             else:
-              saved[idx][1].append( ( selector, [ decla ] ) )
+              saved[idx][2].append( ( selector, [ decla ] ) )
             toreplace.append( ( d.start(), 
                                 d.end(), 
                                 "" ) )
     cut.replace_preserving( toreplace )
 
-    out = ""
-    for mediabody, rules in saved:
-      out += "@media %s {\n" % mediabody
+    for medianame, mediabody, rules in saved:
+      out = "@media %s {\n" % mediabody
       for selector, declarations in rules:
         out += "%s {\n" % selector
         for decla in declarations:
           out += "%s" % decla
         out += "}\n" 
       out += "}\n" 
-
-    cut.append( out )
+      cut.register_append("/**  Breakpoint: %s  **/\n" % medianame)
+      cut.append( out )
 
 #}}}
 #{{{ Arithmetics

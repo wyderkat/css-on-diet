@@ -17,8 +17,7 @@ li {
 
 ul {
   pa- 3p @medium
-  pa- 4p @big
-}
+  pa- 4p @big}
 
 @media screen and (min-width: 32em) {
   ul {
