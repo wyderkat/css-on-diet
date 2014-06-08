@@ -660,41 +660,44 @@ def move_media( media, cut ):
 
   if not media.empty():
 
-    sets = SEtRE.finditer( str(cut) )
-    toreplace = [] # has to be ordered
-    saved = [] # structure of tables and tuples 
+    rules = RULeRE.finditer( str(cut) )
+    toreplace = []
+    saved = [] # selected @media to place at the end of file
+               # structure of tables and tuples 
                # cannot use OrderedDict because python2.6
-    for m in media.get_bodies():
-      saved.append( (m, []) )
-    # TODO faster would be just look for lines with @mediabreakpoints
-    for s in sets:
-      
-      selector = s.group(1)
-      rules = RULeRE.finditer( str(cut), s.start(2), s.end(2) )
-      for rule in rules:
+    for b in media.get_bodies():
+      saved.append( (b, []) )
 
-        value = rule.group("value")
+    # faster would be just look for lines with @mediabreakpoints
+    # but how to get selector then?
+    for r in rules:
+      
+      selector = r.group(1)
+      declarations = DECLARATIOnRE.finditer( str(cut), r.start(2), r.end(2) )
+      for d in declarations:
+
+        value = d.group("value")
         splitted = value.split()
-        if len(splitted)>0:
+        if len(splitted) >0 :
           idx = media.find_index( splitted[-1] )
           if idx != None:
-            decla = rule.group().replace( splitted[-1], "" ) # remove @medianame
-            for ruleselector, declarations in saved[idx][1]:
-              if ruleselector == selector:
-                declarations.append( decla )
+            decla = d.group().replace( splitted[-1], "" ) # remove @medianame
+            for selectorsaved, declarationssaved in saved[idx][1]:
+              if selectorsaved == selector:
+                declarationssaved.append( decla )
                 break
             else:
               saved[idx][1].append( ( selector, [ decla ] ) )
-            toreplace.append( ( rule.start(), 
-                                rule.end(), 
+            toreplace.append( ( d.start(), 
+                                d.end(), 
                                 "" ) )
     cut.replace_preserving( toreplace )
 
     out = ""
     for mediabody, rules in saved:
       out += "@media %s {\n" % mediabody
-      for ruleselector, declarations in rules:
-        out += "%s {\n" % ruleselector
+      for selector, declarations in rules:
+        out += "%s {\n" % selector
         for decla in declarations:
           out += "%s" % decla
         out += "}\n" 
@@ -823,7 +826,7 @@ STRINgSUBRE = r"""
   )
 """
 
-SEtRE = re.compile( r"""
+RULeRE = re.compile( r"""
 \s*([^;{}]+)\s*  # selector 
 {
   (  # main body
@@ -836,7 +839,7 @@ SEtRE = re.compile( r"""
 }
 """ % STRINgSUBRE, re.S | re.X ) 
 
-RULeRE = re.compile( r"""
+DECLARATIOnRE = re.compile( r"""
 \s*   # consume all white space (only for @cod-media?)
 (?P<param>[\w\-]+) # parameter
 (?P<sep>[\s:]+) # optional separator
@@ -854,46 +857,46 @@ VALUeRE = re.compile( r"(\S+\s*\(.*?\)|\S+)"  )
 UNItRE = re.compile( r"\b\d+([a-z])\b" )
   
 def put_on_diet( cut ):
-  sets = SEtRE.finditer( str(cut) )
-  abbmatch = [] # has to be ordered
-  for s in sets:
+  rules = RULeRE.finditer( str(cut) )
+  toreplace = [] # has to be ordered
+  for r in rules:
 
-    rules = RULeRE.finditer( str(cut), s.start(2), s.end(2) )
-    for rule in rules:
+    declarations = DECLARATIOnRE.finditer( str(cut), r.start(2), r.end(2) )
+    for d in declarations:
 
-      if rule.group("param") in PROPERTyMNEMONICS:
-        abbmatch.append( ( rule.start("param"), 
-                             rule.end("param"), 
-                             PROPERTyMNEMONICS[ rule.group("param") ] ) )
+      if d.group("param") in PROPERTyMNEMONICS:
+        toreplace.append( ( d.start("param"), 
+                             d.end("param"), 
+                             PROPERTyMNEMONICS[ d.group("param") ] ) )
 
-      if not ":" in rule.group("sep"):
-        abbmatch.append( ( rule.start("sep"), 
-                           rule.start("sep"), # insert at the begining
+      if not ":" in d.group("sep"):
+        toreplace.append( ( d.start("sep"), 
+                           d.start("sep"), # insert at the begining
                            ":" ) )
 
 
-      values = VALUeRE.finditer( str(cut), rule.start("value"), rule.end("value") )
-      for val in values:
-        if val.group(1) in VALUeMNEMONICS:
-          abbmatch.append( ( val.start(1), 
-                               val.end(1), 
-                               VALUeMNEMONICS[ val.group(1) ] ) )
+      values = VALUeRE.finditer( str(cut), d.start("value"), d.end("value") )
+      for v in values:
+        if v.group(1) in VALUeMNEMONICS:
+          toreplace.append( ( v.start(1), 
+                              v.end(1), 
+                              VALUeMNEMONICS[ v.group(1) ] ) )
         else:
-          units = UNItRE.finditer( str(cut), val.start(1), val.end(1) )
-          for unit in units:
-            if unit.group(1) in UNItMNEMONICS:
-              abbmatch.append( ( unit.start(1), 
-                                   unit.end(1), 
-                                   UNItMNEMONICS[ unit.group(1) ] ) )
+          units = UNItRE.finditer( str(cut), v.start(1), v.end(1) )
+          for u in units:
+            if u.group(1) in UNItMNEMONICS:
+              toreplace.append( ( u.start(1), 
+                                  u.end(1), 
+                                  UNItMNEMONICS[ u.group(1) ] ) )
 
 
 
-      if rule.group("delim") == "\n":
-        abbmatch.append( ( rule.start("delim"), 
-                           rule.start("delim"), # insert at the begining
+      if d.group("delim") == "\n":
+        toreplace.append( ( d.start("delim"), 
+                           d.start("delim"), # insert at the begining
                            ";" ) )
 
-  cut.replace_preserving( abbmatch )
+  cut.replace_preserving( toreplace )
 
 
 HEADErRE = re.compile( r"^//!(.*?)\n", re.S )
