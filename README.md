@@ -16,7 +16,7 @@ Use old CSS
       background-color: #1C6BA0;
     }
 
-If all your CSS declarations are in separate lines you don't have to change anything. Normal CSS can be mixed with CSS-On-Diet.
+If all your CSS declarations are on separate lines you don't have to change anything
 
 Remove colons
 -------------
@@ -26,7 +26,7 @@ Remove colons
       background-color #1C6BA0
     }
 
-In CSS-On-Diet colons and semicolons are optional.
+In CSS-On-Diet colons and semicolons are optional
 
 Use mnemonics
 -------------
@@ -38,6 +38,19 @@ Use mnemonics
 
 Common CSS keywords have mnemonics. Parameters are 3 letters long, values 2, and units just 1 letter ([The list](http://www.cofoh.com/css-on-diet-LATEST))
 
+Medias Breakpoints
+------------------
+
+    @cod-media {
+      tablet (min-width: 768px)
+    }
+    .element {
+      les 2p
+      les 3p @tablet
+    }
+
+Responsive Web Design was never so easy and intuitive
+
 One line comments
 -----------------
 
@@ -46,7 +59,7 @@ One line comments
       bac #1C6BA0 // deep ocean
     }
 
-One line comments finish at the end of the line. No need to close it anymore.
+No need to remember to close those comments
 
 Nested comments
 ---------------
@@ -58,8 +71,8 @@ Nested comments
       bac #1C6BA0
     }
 
-Now you can comment out code with other comment. Finally...
-
+Now you can comment out code with other comment inside. Finally...
+ 
 Arithmetics
 -----------
 
@@ -68,7 +81,7 @@ Arithmetics
       bac #1C6BA0
     }
 
-CSS doesn't need complicated calculations. But it needs some basic operations.
+CSS needs calculations. That's more than sure.
 
 Short RGBA
 ----------
