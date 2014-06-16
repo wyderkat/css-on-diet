@@ -1170,7 +1170,7 @@ if __name__ == "__main__":
     argparse.ArgumentParser.add_argument = argparse.ArgumentParser.add_option
 
   parser = argparse.ArgumentParser(
-    description= "CSS-On-Diet - preprocessor for CSS files",
+    description= "CSS-On-Diet - preprocessor for CSS files - ver. %s" % VERSION,
     epilog="www.cofoh.com/css-on-diet"
   )
 
@@ -1195,9 +1195,13 @@ if __name__ == "__main__":
     '-I', '--include-dirs', metavar='dir[,dir...]', 
     help="List of additional directories to look for included files. Separtor is the comma sign."
   )
+  parser.add_argument(
+    '-v', '--version',  action="store_true",
+    help="Print software and specification versions"
+  )
   # FINISH
   if not optmode:
-    parser.add_argument('cod_files', metavar='file.cod', nargs="+",
+    parser.add_argument('cod_files', metavar='file.cod', nargs="*",
                         help='CSS-On-Diet file to preprocess.' +
                         ' Multiple files are joined.' +
                         ' If "-" given read from STDIN instead of file.')
@@ -1205,6 +1209,16 @@ if __name__ == "__main__":
   else:
     (args, leftargs) = parser.parse_args()
     args.cod_files = leftargs
+
+  if args.version:
+    print("Version %s (for specification %s)" % (VERSION, PROToVERSION))
+    sys.exit(0)
+
+  # has to be after args.version
+  if len( args.cod_files ) < 1:
+    sys.stderr.write("Error: Give at least one file to preprocess\n")
+    sys.exit(1)
+    
 
   stdinasfile = 0
   for f in args.cod_files:
