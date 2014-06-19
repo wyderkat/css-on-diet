@@ -16,8 +16,8 @@ import math
 
 #}}}
 
-VERSION = "1.5"
-PROToVERSION = "1.5"
+VERSION = "1.6"
+PROToVERSION = "1.6"
 
 #{{{ Mnemonics List
 
@@ -181,6 +181,7 @@ VALUeMNEMONICS = {
   "is":"inset",
   "it":"italic",
   "le":"left",
+  "lg":"linear-gradient",
   "li":"linear",
   "lo":"lowercase",
   "mi":"middle",
@@ -191,6 +192,7 @@ VALUeMNEMONICS = {
   "pb":"padding-box",
   "po":"pointer",
   "re":"relative",
+  "rg":"radial-gradient",
   "ri":"right",
   "rx":"repeat-x",
   "ry":"repeat-y",
