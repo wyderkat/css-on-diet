@@ -529,9 +529,12 @@ class a_defines(object):
     # to avoid substring substitutions inside @cod-defines
     me.db = []
   def add_def( me, name, body ):
-    pat1 = r"(?<!%s)" % DEFINeNAMeCHAR
+    # because of - in arythmeticts, this is not possible
+    #pat1 = r"(?<!%s)" % DEFINeNAMeCHAR
+    pat1 = r"\b"
     pat2 = re.escape( name ) 
-    pat3 = r"(?!%s)" % DEFINeNAMeCHAR
+    #pat3 = r"(?!%s)" % DEFINeNAMeCHAR
+    pat3 = r"\b"
     pat4 = r"(?:\s*\((.*?)\))?" # optional parentheses
 
     patin = re.compile( pat2 + pat4 ) 

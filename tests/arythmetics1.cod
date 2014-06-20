@@ -3,6 +3,7 @@
 @cod-defines {
   MYCAR 12p+3p
   CAR (MYCAR)*2
+  CAR-MYCAR 13
 }
 li {
   mal 200p
@@ -11,6 +12,9 @@ li {
   mal 200p-2**2
   mal 200p+300i
   mal CAR
+  mal CAR+15p
+  mal CAR-15p
+  mal CAR-MYCAR-1
   mal20+3 // no white spaces around
   mal 20+4   +4 // whitespace inside
   mal 20+4 4+4 // one space separator
