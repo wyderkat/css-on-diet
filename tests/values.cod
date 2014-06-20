@@ -1,0 +1,9 @@
+li {
+  wid %% !i
+  wid:%% !i;
+  bai lg(to right, red, green, blue);
+  bai lg (to right, red, green, blue);
+  bai lg ( to right, red, green, blue);
+
+  bai lg(to right, red, green, blue) url(" bac ") %i;
+}
