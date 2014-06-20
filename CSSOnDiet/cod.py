@@ -877,7 +877,7 @@ DECLARATIOnRE = re.compile( r"""
 """ % STRINgSUBRE, re.S | re.X ) 
 
 # TODO str supp
-VALUeRE = re.compile( r"(\S+\s*\(.*?\)|\S+)"  )
+VALUeRE = re.compile( r"([\w!%-]+)(\s*\(.*?\))?"  )
 UNItRE = re.compile( r"\b\d+([a-z])\b" )
   
 def apply_mnemonics( cut ):
