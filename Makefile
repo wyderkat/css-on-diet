@@ -44,5 +44,9 @@ $(SUBLIME_COD_COPY): CSSOnDiet/cod.py
 	@cp $< $@
 
 
+guide.html: guide.md
+	markdown $< > $@
+
+
 
 .PHONY: clean test dist d all cofoh pypi pypiinfo sublime pub
