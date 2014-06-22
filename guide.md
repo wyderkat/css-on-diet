@@ -1,16 +1,87 @@
 CSS-On-Diet Developer Guide
 ===========================
 
-
 Introduction
 ============
-*COD* - CSS-On-Diet
-Aplied to *COD* 1.5
-... TODO
+*CSS-On-Diet* is a CSS Preprocessor with quite unique features. 
+By intention it should be easy to use and fast to learn.
+Other preprocessors seems to be focusing on adding new functions to *CSS* 
+making the learning processes bit complicated and time consuming.
+*CSS-On-Diet* focuses on writing *CSS* faster. 
+Actually it not only makes writing, but also changing and reading it faster.
 
-Installation
-============
-... TODO
+Lets use *COD* as a shortcut for *CSS-On-Diet* in following text. This document applies to 
+[*COD Specification Version 1.5*](http://www.cofoh.com/css-on-diet-1.5), 
+which is technical and detailed document. This Developer Guide is more human friendly version.
+
+For more information check out 
+[*COD Website*](http://www.cofoh.com/css-on-diet). 
+
+
+Installation and usage
+======================
+As of current (1.5) version of 
+[*COD Specification*](http://www.cofoh.com/css-on-diet-1.5), 
+we deliver only command line tool.
+It's written in Python, and called **cod**. 
+We have plans for making windows application which will be easier to install.
+
+Please note that COD files have *.cod* extension in their name and should be named like
+that for editors support.
+
+To check if **cod** is already installed try to check out version:
+
+    cod -v
+
+
+To install **cod** command line tool you have few choices. Lets start from most simple:
+
+1. If you are using [Sublime Text Editor](http://www.sublimetext.com/), just type
+
+        CSS-On-Diet
+
+    in the Install Package box. The *COD* editor plugin includes **cod** command line tool,
+    and it's connected to the editor's build system. So when you save file with *.cod* extensions,
+    syntax will be highlighted and file will be compiled to *CSS* when build command is executed. 
+
+    Note that Package Controller which provides Install Package box has to be installed separately
+    from [here](https://sublime.wbond.net/installation).
+
+2. If you have installed Python (default for Linux and MacOS), just use 
+   [pip installator](https://pip.pypa.io/en/latest/installing.html). 
+
+        pip install CSSOnDiet
+
+   That's recommend and most flexible way.  On some systems *pip* command is not installed by
+   default. You have to [install it](https://pip.pypa.io/en/latest/installing.html) first. 
+
+3. You can also download latest *COD* package from [our website](http://www.cofoh.com/css-on-diet),
+   unpack it like this (or other way you prefer):
+
+        tar xfvz CSSOnDiet-1.5.tar.gz
+   
+   get inside unpacked directory and execute:
+       
+        python setup.py install
+
+Note that only 1st choice doesn't require Python. Sublime Text Editor has embedded Python
+runtime. But it doesn't give you access to **cod** script on system level, just from that editor.
+
+Usage
+-----
+
+Command line tool **cod** preprocesses *COD* files:
+
+    cod input.cod -o output.css
+
+Add -m argument to minify your *CSS*:
+
+    cod input.cod -o output.css -m
+
+Check out more options from help message:
+  
+    cod -h
+
 
 Formatting 
 ==========
@@ -298,7 +369,7 @@ Macros (functions) are defines with arguments:
 Define name doesn't need any special signature to be a macro. 
 Just in places where arguments will be expanded use *_ARG1_*, *_ARG2_*, *_ARG3_*, etc. That's all.
 
-Includes and comments
+Includes
 ========
 Including others files from *COD* file merges everything, resulting in a single *CSS* output. That
 means a single HTTP request comparing to native @import rule. 
@@ -402,6 +473,4 @@ will produce:
     rgba(67,12,168,0.992)
     rgba(67,12,168,0.996)
     rgba(67,12,168,1)
-
-
 
