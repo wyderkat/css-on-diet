@@ -1,6 +1,6 @@
 [submodule "sublimetext"]
 	path = sublimetext
 	url = https://github.com/wyderkat/css-on-diet--sublime-text.git
-[submodule "grunt-cssondiet"]
-	path = grunt-cssondiet
+[submodule "grunt"]
+	path = grunt
 	url = https://github.com/wyderkat/css-on-diet--grunt.git

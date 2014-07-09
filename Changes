@@ -1,8 +1,10 @@
-V1.6 2014-06-20
+V1.6 2014-07-09
 
   * Gradients mnemonics
 
   * Arythmetics with variables with minus support
+
+  * Repeating --include-dirs argument
 
 V1.5 2014-06-10
 

@@ -1197,8 +1197,11 @@ if __name__ == "__main__":
     help="Minify CSS result code. Implies --no-comments and --no-header"
   )
   parser.add_argument(
-    '-I', '--include-dirs', metavar='dir[,dir...]', 
-    help="List of additional directories to look for included files. Separtor is the comma sign."
+    '-I', '--include-dirs', metavar='dir[,dir...]',
+    action='append', # repeating arguments
+    help="List of additional directories to look for included files. " +\
+         "Multiple dirs can be separated by commas or by multiple " +\
+         "-I(--include-dirs) arguments."
   )
   parser.add_argument(
     '-v', '--version',  action="store_true",
@@ -1239,7 +1242,10 @@ if __name__ == "__main__":
     args.no_header = True
 
   if args.include_dirs:
-    args.include_dirs = args.include_dirs.split(",")
+    result = []
+    for i in args.include_dirs:
+      result += i.split(",")
+    args.include_dirs = result
   else:
     args.include_dirs = [] # more useful than None
 
