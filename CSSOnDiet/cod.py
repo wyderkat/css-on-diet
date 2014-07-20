@@ -16,7 +16,7 @@ import math
 
 #}}}
 
-VERSION = "1.6"
+VERSION = "1.6.1"
 PROToVERSION = "1.6"
 
 #{{{ Mnemonics List
@@ -259,24 +259,30 @@ class a_cut( object ):
     me.cutregister.append( ( afterlastcut, str ) )
 
 
-  def cut_and_save( me, indexes ):
+  def cut_and_save( me, indexes, a ):
     """ 
-    cut data (like comments) and save them in register for later recover
+    cut data (like comments) and save them in the register for later recover
     """
     result = ""
     last = 0
+    fromlastsaved = 0
     for start,end in indexes:
       result += me.str[ last : start ]
       tosave = me.str[ start: end ]
-      tail = -2 # not to re-nest
-      # extract cpp comments
-      if tosave[:2] == "//":
-        tosave = "/*" + tosave[2:] + "*/"
-        tail = -2
-      # re-nest nested comments
-      tosave = NESTEdRE.sub( "*-/", tosave[:tail] ) + tosave[tail:]
-      #
-      me.cutregister.append( ( start-last, tosave ) )
+      # OK, removed. Now save in the register only if
+      # 1. comments in the output are turned on
+      # or
+      # 3. comment doesn't contain exclamation under 3rd letter
+      fromlastsaved += start-last
+      if not a.no_comments or (  len(tosave)>2 and tosave[2] == "!"  ):
+        # extract cpp comments
+        if tosave[:2] == "//":
+          tosave = "/*" + tosave[2:] + "*/"
+        # re-nest nested comments
+        tosave = NESTEdRE.sub( "*-/", tosave[:-2] ) + tosave[-2:]
+        #
+        me.cutregister.append( ( fromlastsaved, tosave ) )
+        fromlastsaved = 0
       last = end
     result += me.str[ last : ]
     me.str = result
@@ -445,7 +451,7 @@ COMMENTsRE = re.compile( r"""
                         \*/  
                         """, re.X ) 
 
-def rm_comments( cut ):
+def rm_comments( cut, a ):
   nocomment = 0 # no inside comment
   c = 1 # c-like comments, but nested
   cpp = 2 # c++like comments
@@ -495,7 +501,7 @@ def rm_comments( cut ):
         mode = c
         clevel += 1
     
-  cut.cut_and_save( matchesidx )
+  cut.cut_and_save( matchesidx, a )
 
 #}}}
 #{{{ Defines
@@ -1085,7 +1091,7 @@ def include_files_recursiv( a, filename, included_sha1 ):
   contentcut= a_cut( content )
   flat_newlines( contentcut )
   extract_header( contentcut )
-  rm_comments( contentcut )
+  rm_comments( contentcut, a )
   tomerge = []
   for infile, position in find_includes( contentcut ):
     alldirs = [directory] + a.include_dirs
@@ -1140,8 +1146,7 @@ def put_css_on_diet( a, error_handler ):
   apply_mnemonics( contentcut )
   expand_rgba( contentcut )
 
-  if not a.no_comments:
-    contentcut.recover_from_save() 
+  contentcut.recover_from_save() 
   if not a.no_header:
     add_header( contentcut )
 

@@ -28,6 +28,7 @@ test_user_buttons() { one2one user-buttons; }
 test_newlines() { one2one newlines; }
 test_media2() { one2one media2; }
 test_values() { one2one values; }
+test_minify1() { minify1; }
 
 
 oneTimeSetUp()
@@ -53,11 +54,17 @@ application_start()
 }
 
 assert_except_1st_line()
-# $1 - file 1
+# $1 - file1
 # $2 - file2
 {
   assertTrue "wrong result file" \
     "cmp <(tail -n +2 $1) <(tail -n +2 $2)" # start from 2nd line
+}
+assert_every_line()
+# $1 - file 1
+# $2 - file2
+{
+  assertTrue "wrong result file"  "cmp $1 $2" 
 }
 
 switches()
@@ -131,18 +138,19 @@ include_dirs()
   assert_except_1st_line $expected $out
 }
 
-
-
-application_logging()
+minify1()
 {
-  LOG=$SL_DIR/logs/SL.log.bz2 
-  assertTrue "Cannot find SL.py main log file!" "[ -r $LOG ]"
-  check_sum_before=`md5sum $LOG`
-  out=`sl_send "Wrong command;"`
-  check_sum_after=`md5sum $LOG`
-  assertNotSame "Log file is not updating!" "$check_sum_before" "$check_sum_after"
+  in=minify1.cod
+  out=minify1.result.css
+  expected=minify1.css
 
+  $COD -m $in > $out 2> /dev/null
+
+  assertSame "execution error" 0 $?
+
+  assert_every_line $expected $out
 }
+
 
 
 # TEST ENGINE

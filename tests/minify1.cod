@@ -1,3 +1,4 @@
+/*! Header Comment */
 p * i ,  html   
 /* remove spaces */
 
@@ -7,11 +8,11 @@ p  [ remove ~= " spaces  " ]  :nth-child( 3 + 2n )  >  b span   i  ,   div::afte
 
 {
   /* comment */
-    background :  url(  "  /* string */  " )   blue !important ;
+    ba- :  url(  "  /* string */  " )   blue !i ;
         content  :  " escapes \" allowed \\" ;
-      width: calc( 100% - 3em + 5px ) ;
-  margin-top : 0;
-  margin-bottom : 0;
-  margin-left : 10px;
-  margin-right : 10px;
+      wid: calc( 100% - 3em + 5px ) ;
+  mat : 0;
+  mab : 0;
+  mal : 10p;
+  mar : 10p;
 }
