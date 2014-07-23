@@ -1,7 +1,7 @@
 CSS-On-Diet
 ===========
 
-CSS-On-Diet is a preprocessor for CSS files. The key feature are mnemonics for frequently used properties and value names, which are similar to Emmet abbreviations. Other goodies include optional colons and semicolons, nested and one line comments, variables and mixins, calculator, hexadecimal RGBA.
+CSS-On-Diet is a preprocessor for CSS files. The key feature is mnemonics for frequently used properties, which are similar to Emmet abbreviations. Other goodies include intuitive media breakpoints, nested and single line comments, variables and mixins, a calculator, hexadecimal RGBA, minifier, ...
 
 Much more information on [www.cofoh.com/css-on-diet](http://www.cofoh.com/css-on-diet)
 
