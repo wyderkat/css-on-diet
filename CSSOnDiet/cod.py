@@ -16,8 +16,8 @@ import math
 
 #}}}
 
-VERSION = "1.6.1"
-PROToVERSION = "1.6"
+VERSION = "1.6.2"
+PROToVERSION = "1.7"
 
 #{{{ Mnemonics List
 
@@ -210,6 +210,7 @@ VALUeMNEMONICS = {
 UNItMNEMONICS = {
   "p":"px",
   "e":"em",
+  "r":"rem",
   "i":"in",
   "c":"cm",
   "m":"mm",
@@ -747,6 +748,7 @@ ARITHMETIcRE = re.compile( r"""
     \d+px?|     # digit with unit
     \d+%|       # ...
     \d+em?|
+    \d+r(?:em)?|
     \d+in?|
     \d+cm?|
     \d+mm?|
@@ -762,6 +764,7 @@ ARITHMETIcUNITsRE = re.compile( r"""
     px?|
     %|
     em?|
+    r(?:em)?|
     in?|
     cm?|
     mm?|

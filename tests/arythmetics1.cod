@@ -22,6 +22,8 @@ li {
   mal 21/5  // integer division
   mal 21/5.00 // floats
   mal 21.0/5 // floats
+  mal 10r
+  mal 10.0+2r
 }
 
 
