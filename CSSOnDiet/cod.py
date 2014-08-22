@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 ###
 # Copyright 2014 Tomasz Wyderka <wyderkat@cofoh.com>
 #  www.cofoh.com
@@ -7,7 +8,7 @@
 
 #{{{ import
 
-from __future__ import division # for python2-3 compatibility
+from __future__ import division  # for python2-3 compatibility
 import re
 import sys
 from os import path
@@ -261,7 +262,7 @@ class a_cut( object ):
 
 
   def cut_and_save( me, indexes, a ):
-    """ 
+    """
     cut data (like comments) and save them in the register for later recover
     """
     result = ""
@@ -301,12 +302,12 @@ class a_cut( object ):
 
   def last_cut_dinstances( me ):
     """ get ( characters after last cut, and last cut absolute position ) """
-    absolutregpos = 0 # absolute register position, because register keeps only relative 
+    absolutregpos = 0 # absolute register position, because register keeps only relative
     for cut in me.cutregister:
       absolutregpos += cut[0]
     return ( len(me.str) - absolutregpos, absolutregpos )
 
-    
+
   def replace_preserving( me, indexeswithdata, merge = False ):
     """
     For (start,end,stringorcut) in indexeswithdata:
@@ -321,10 +322,10 @@ class a_cut( object ):
       laststridx = 0 # pos of last character in string
       newcutreg = [] # updated cut register, constructed by iteration
       lastregidx = 0 # pos of last visited record in register
-      absolutregpos = 0 # absolute register position, because register keeps only relative position from last record. 
+      absolutregpos = 0 # absolute register position, because register keeps only relative position from last record.
 
       # following loop assumes indexeswithdata and cutregister are sorted!
-      again = False # flag for visiting register record more than once 
+      again = False # flag for visiting register record more than once
       afterremovefix = 0 # when removing comments
 
       for start,end,stringorcut in indexeswithdata:
@@ -344,10 +345,10 @@ class a_cut( object ):
             afterremovefix = 0
 
           # Main condition to check if cut should be updated
-          # it works because als cuts before are skipped in the 
+          # it works because als cuts before are skipped in the
           # "else" statement below
           if absolutregpos > start:
-            if absolutregpos < end: 
+            if absolutregpos < end:
               # delete this register (together with content)
               if again:
                 try:
@@ -364,7 +365,7 @@ class a_cut( object ):
               continue # it's not needed, but for visibility
             else:
               #how much substitute changed text
-              delta = len(str(stringorcut)) - (end-start) 
+              delta = len(str(stringorcut)) - (end-start)
               if not again:
                 # update register from oryginal
                 newcutreg.append(  ( cut[0] + delta, cut[1] )  )
@@ -381,7 +382,7 @@ class a_cut( object ):
           else:
             if not again:
               # copy record without updating. not needed
-              newcutreg.append( cut ) 
+              newcutreg.append( cut )
             lastregidx += 1 # skip this record next iteration
             again = False
 
@@ -391,7 +392,7 @@ class a_cut( object ):
             stringorcut,
             newcutreg,
             newstr,
-            tail = True) 
+            tail = True)
 
       # copy rest of the string
       newstr += me.str[ laststridx : ]
@@ -399,7 +400,7 @@ class a_cut( object ):
       againfix = 1 if again else 0
       for i in range( lastregidx + againfix, len(me.cutregister) ):
         newcutreg.append( me.cutregister[i] )
-      
+
       # save str and register
       # We need to do it at the end because all indexes are from oryginal string
       me.str = newstr
@@ -410,7 +411,7 @@ class a_cut( object ):
         stringorcut,
         newcutreg,
         newstr,
-        tail = False 
+        tail = False
     ):
     result = False
     if stringorcut != []:
@@ -421,7 +422,7 @@ class a_cut( object ):
       else:
         lastindex = -1
 
-      a = 0 
+      a = 0
       for cut in newcutreg[:lastindex]: # the last included cut is before -1
         a += cut[0]
       oldfilling = len(newstr) - len(str(stringorcut)) - a # len() - len() means previous text
@@ -434,7 +435,7 @@ class a_cut( object ):
             [ ( newcutreg[-1][0] - oldfilling - mergeabsolute, newcutreg[-1][1] ) ]
         else:
           newcutreg += mergecut
-      
+
       result = True
     return ( result, newcutreg )
 
@@ -449,8 +450,8 @@ COMMENTsRE = re.compile( r"""
                         \n   |
                         //   |
                         /\*  |
-                        \*/  
-                        """, re.X ) 
+                        \*/
+                        """, re.X )
 
 def rm_comments( cut, a ):
   nocomment = 0 # no inside comment
@@ -501,7 +502,7 @@ def rm_comments( cut, a ):
         start = i.start()
         mode = c
         clevel += 1
-    
+
   cut.cut_and_save( matchesidx, a )
 
 #}}}
@@ -514,7 +515,7 @@ DEFINEsBLOCkRE = re.compile( r"""
   {
   (.*?) # everything up to close
   $\s* } \s*$    # has to be in separate line
-                            """, re.X|re.S|re.M ) 
+                            """, re.X|re.S|re.M )
 
 DEFINeNAMeCHAR = r"[-\w]"
 # TODO str supp
@@ -523,11 +524,11 @@ DEFINEsRE = re.compile( r"""
   [ \t\r\f\v]*       # not \n! can be empty when no body
   (?P<body>.*?)      # can be empty
   $                  # end of line or text
-                       """ % DEFINeNAMeCHAR, re.X|re.M ) 
+                       """ % DEFINeNAMeCHAR, re.X|re.M )
 
 class a_defines(object):
   def __init__( me ):
-    # list of 
+    # list of
     #(name, body, pat_in, pat_out)
     # where pat_in is pattern maching name
     # to use inside @cod-define
@@ -539,13 +540,13 @@ class a_defines(object):
     # because of - in arythmeticts, this is not possible
     #pat1 = r"(?<!%s)" % DEFINeNAMeCHAR
     pat1 = r"\b"
-    pat2 = re.escape( name ) 
+    pat2 = re.escape( name )
     #pat3 = r"(?!%s)" % DEFINeNAMeCHAR
     pat3 = r"\b"
     pat4 = r"(?:\s*\((.*?)\))?" # optional parentheses
 
-    patin = re.compile( pat2 + pat4 ) 
-    patout = re.compile( pat1 + pat2 + pat3 + pat4 ) 
+    patin = re.compile( pat2 + pat4 )
+    patout = re.compile( pat1 + pat2 + pat3 + pat4 )
 
     i = 0
     while i< len(me.db):
@@ -556,9 +557,9 @@ class a_defines(object):
 
   def get_all(me, out):
     if out:
-      return map( lambda x: (x[3],x[1]) , me.db )
+      return [(x[3],x[1]) for x in me.db]
     else:
-      return map( lambda x: (x[2],x[1]) , me.db )
+      return [(x[2],x[1]) for x in me.db]
 
 def read_defines( cut ):
   defines = a_defines()
@@ -570,7 +571,7 @@ def read_defines( cut ):
 
     definesmatch = DEFINEsRE.finditer( definesblock )
     for d in definesmatch:
-      name = d.group("name") 
+      name = d.group("name")
       body = d.group("body")
       # self expand
       body = expand_defines( defines, body )
@@ -587,14 +588,14 @@ def expand_defines( defines, cutorstr ):
     outside = False
   else:
     outside = True
-  
+
   for defpat,defbody in defines.get_all( outside ):
 
     defcandidate = re.finditer( defpat, str(cutorstr) )
     tocutit = []
     for d in defcandidate:
       newbody = defbody
-      # find arguments 
+      # find arguments
       argumentsstring = d.group(1)
       arguments = []
       if argumentsstring:
@@ -603,12 +604,12 @@ def expand_defines( defines, cutorstr ):
           arguments.append( a.strip() )
       # apply arguments
       if arguments:
-        newbody = DEFINeARGUMENT.sub( 
+        newbody = DEFINeARGUMENT.sub(
           lambda x: expand_argument(arguments,x,defbody), defbody )
 
       if outside:
-        tocutit.append( ( d.start(), 
-                          d.end(), 
+        tocutit.append( ( d.start(),
+                          d.end(),
                           newbody ) )
       else: # inside define block
         cutorstr = cutorstr[:d.start()] + newbody + cutorstr[d.end():]
@@ -617,13 +618,13 @@ def expand_defines( defines, cutorstr ):
       cutorstr.replace_preserving( tocutit )
 
   return cutorstr
-      
+
 def expand_argument( arguments, matchobject, body ):
   no = int( matchobject.group(1) )
   try:
     return arguments[ no - 1]
   except IndexError:
-    log_err( "Missing argument for define: '%s'\n" % body ) 
+    log_err( "Missing argument for define: '%s'\n" % body )
     return ""
 
 #}}}
@@ -635,7 +636,7 @@ MEDIaBLOCkRE = re.compile( r"""
   {
   (.*?) # everything up to close
   }
-                            """, re.X|re.S|re.M ) 
+                            """, re.X|re.S|re.M )
 
 MEDIaNAMeCHAR = DEFINeNAMeCHAR
 # TODO str supp
@@ -644,14 +645,14 @@ MEDIaRe = re.compile( r"""
   [ \t\r\f\v]*       # not \n! can be empty when no body
   (?P<body>.*?)      # can be empty
   $                  # end of line or text
-                       """ % MEDIaNAMeCHAR, re.X|re.M ) 
+                       """ % MEDIaNAMeCHAR, re.X|re.M )
 
 # TODO common base class for a_medias and a_defines
 class a_media(object):
   def __init__( me ):
-    # list of 
+    # list of
     # (name, body, @name)
-    # where @name is word to find 
+    # where @name is word to find
     me.db = []
   def add_media( me, name, body ):
     me.db.append( (name, body, "@"+name) )
@@ -667,7 +668,7 @@ class a_media(object):
       index += 1
     return None
   def get_breakpoints( me ):
-    return map( lambda x: (x[0],x[1]), me.db) 
+    return [(x[0],x[1]) for x in me.db]
 
 def read_media( cut ):
   media = a_media()
@@ -679,7 +680,7 @@ def read_media( cut ):
 
     mediamatch = MEDIaRe.finditer( mediasblock )
     for m in mediamatch:
-      name = m.group("name") 
+      name = m.group("name")
       body = m.group("body")
       # self expand
       # Not for media # body = expand_defines( media, body )
@@ -695,7 +696,7 @@ def move_media( media, cut ):
     rules = RULeRE.finditer( str(cut) )
     toreplace = []
     saved = [] # selected @media to place at the end of file
-               # structure of tables and tuples 
+               # structure of tables and tuples
                # cannot use OrderedDict because python2.6
     for n,b in media.get_breakpoints():
       saved.append( (n, b, []) )
@@ -703,7 +704,7 @@ def move_media( media, cut ):
     # faster would be just look for lines with @mediabreakpoints
     # but how to get selector then?
     for r in rules:
-      
+
       selector = r.group(1)
       declarations = DECLARATIOnRE.finditer( str(cut), r.start(2), r.end(2) )
       for d in declarations:
@@ -720,8 +721,8 @@ def move_media( media, cut ):
                 break
             else:
               saved[idx][2].append( ( selector, [ decla ] ) )
-            toreplace.append( ( d.start(), 
-                                d.end(), 
+            toreplace.append( ( d.start(),
+                                d.end(),
                                 "" ) )
     cut.replace_preserving( toreplace )
 
@@ -731,8 +732,8 @@ def move_media( media, cut ):
         out += "%s {\n" % selector
         for decla in declarations:
           out += "%s" % decla
-        out += "}\n" 
-      out += "}\n" 
+        out += "}\n"
+      out += "}\n"
       cut.register_append("/**  Breakpoint: %s  **/\n" % medianame)
       cut.append( out )
 
@@ -758,8 +759,8 @@ ARITHMETIcRE = re.compile( r"""
     \d+         # has to be at the end - no unit
     )+
     )
-    (?=\s)   
-                       """,  re.X | re.S ) 
+    (?=\s)
+                       """,  re.X | re.S )
 ARITHMETIcUNITsRE = re.compile( r"""
     px?|
     %|
@@ -771,10 +772,10 @@ ARITHMETIcUNITsRE = re.compile( r"""
     e?x|
     pt|
     pc
-                       """,  re.X ) 
+                       """,  re.X )
 ARITHMETIcAtLEAStTWoRE = re.compile( r"""
     [\-+*/][\d(]
-                       """,  re.X ) 
+                       """,  re.X )
 
 def reduce_arithmetic( cut ):
   tochange = []
@@ -794,12 +795,12 @@ def reduce_arithmetic( cut ):
     resultstr = str(result)
     if unit:
       resultstr += unit
-    tochange.append( ( a.start(1), 
-                       a.end(1), 
+    tochange.append( ( a.start(1),
+                       a.end(1),
                        resultstr ) )
   cut.replace_preserving( tochange )
-    
-    
+
+
 def get_arithmetic_units( a ):
   """naive assumption that units will be the same"""
   """ returns first found unit """
@@ -812,7 +813,7 @@ def get_arithmetic_units( a ):
     else:
       if unit != u.group():
         log_err( "Wrong unit in the expression: '%s'\n" % a )
-        pass 
+        pass
   # remove units
   a = ARITHMETIcUNITsRE.sub( "", a )
   return (a, unit)
@@ -824,20 +825,20 @@ def get_arithmetic_units( a ):
 # but maybe really not needed
 RGBaRE = re.compile( r"""
     \W          # cannot be \b because of \#
-    (           # 
+    (           #
     \#          # don't forget to escape it
     [\dabcdefABCDEF]{8,8} # 8 positions
     )
     \b
-                       """,  re.X | re.S ) 
+                       """,  re.X | re.S )
 def expand_rgba( cut ):
   tochange = []
   rgba = RGBaRE.finditer( str(cut) )
   for c in rgba:
     color = c.group(1)
     colorstr = convert_rgba_hex_to_str( color )
-    tochange.append( ( c.start(1), 
-                       c.end(1), 
+    tochange.append( ( c.start(1),
+                       c.end(1),
                        colorstr ) )
   cut.replace_preserving( tochange )
 
@@ -846,15 +847,15 @@ def convert_rgba_hex_to_str( color ):
   pos = 1
   for x in range(4):
     hexstr = color[pos:pos+2]
-    intvals.append(  int( hexstr, 16 )  ) 
+    intvals.append(  int( hexstr, 16 )  )
     pos += 2
   intvals[3] = round( float(intvals[3])/255, 3 )
   # after round %g will remove trailing zeros
   return "rgba(%d,%d,%d,%.3g)" % tuple(intvals)
-    
+
 #}}}
 #{{{ Apply Mnemonics
-    
+
 STRINgSUBRE = r"""
   (?P<string>
     "(?:[^"\\]+|\\.)*"
@@ -863,7 +864,7 @@ STRINgSUBRE = r"""
 """
 
 RULeRE = re.compile( r"""
-\s*([^;{}]+)\s*  # selector 
+\s*([^;{}]+)\s*  # selector
 {
   (  # main body
     (?:
@@ -873,7 +874,7 @@ RULeRE = re.compile( r"""
     )*?
   )
 }
-""" % STRINgSUBRE, re.S | re.X ) 
+""" % STRINgSUBRE, re.S | re.X )
 
 DECLARATIOnRE = re.compile( r"""
 \s*   # consume all white space (only for @cod-media?)
@@ -881,18 +882,18 @@ DECLARATIOnRE = re.compile( r"""
 (?P<sep>[\s:]+) # optional separator
 (?P<value>
   (?:
-    %s | # whole string or 
+    %s | # whole string or
     [^;\n] # any character outside whole string
   )+
 ) # value
 (?P<delim>[;\n]?) # delimeter
-""" % STRINgSUBRE, re.S | re.X ) 
+""" % STRINgSUBRE, re.S | re.X )
 
 # TODO str supp
 VALUeRE = re.compile( r"([\w!%-]+)(\s*\(.*?\))?"  )
 #VALUeRE = re.compile( r"([\w!%-]+)"  )
 UNItRE = re.compile( r"\b\d+([a-z])\b" )
-  
+
 def apply_mnemonics( cut ):
   rules = RULeRE.finditer( str(cut) )
   toreplace = [] # has to be ordered
@@ -902,12 +903,12 @@ def apply_mnemonics( cut ):
     for d in declarations:
 
       if d.group("param") in PROPERTyMNEMONICS:
-        toreplace.append( ( d.start("param"), 
-                             d.end("param"), 
+        toreplace.append( ( d.start("param"),
+                             d.end("param"),
                              PROPERTyMNEMONICS[ d.group("param") ] ) )
 
       if not ":" in d.group("sep"):
-        toreplace.append( ( d.start("sep"), 
+        toreplace.append( ( d.start("sep"),
                            d.start("sep"), # insert at the begining
                            ":" ) )
 
@@ -915,21 +916,21 @@ def apply_mnemonics( cut ):
       values = VALUeRE.finditer( str(cut), d.start("value"), d.end("value") )
       for v in values:
         if v.group(1) in VALUeMNEMONICS:
-          toreplace.append( ( v.start(1), 
-                              v.end(1), 
+          toreplace.append( ( v.start(1),
+                              v.end(1),
                               VALUeMNEMONICS[ v.group(1) ] ) )
         else:
           units = UNItRE.finditer( str(cut), v.start(1), v.end(1) )
           for u in units:
             if u.group(1) in UNItMNEMONICS:
-              toreplace.append( ( u.start(1), 
-                                  u.end(1), 
+              toreplace.append( ( u.start(1),
+                                  u.end(1),
                                   UNItMNEMONICS[ u.group(1) ] ) )
 
 
 
       if d.group("delim") == "\n":
-        toreplace.append( ( d.start("delim"), 
+        toreplace.append( ( d.start("delim"),
                            d.start("delim"), # insert at the begining
                            ";" ) )
 
@@ -951,11 +952,11 @@ def add_header( cut ):
   header = "/* Generated by oryginal css-on-diet v%s */\n"  % VERSION
   cut.set_str( header + str(cut) )
 
-#}}} 
+#}}}
 #{{{ Minify
 
 MINIFySPACEsRE = re.compile( r"""
-  %s           # whole string 
+  %s           # whole string
 |
   # ; before } (and the spaces after it while we're here)
   \s* ; \s* ( } ) \s*
@@ -976,7 +977,7 @@ MINIFySPACEsRE = re.compile( r"""
 #    (?:
 #      [^{}"']+
 #    | "(?:[^"\\]+|\\.)*"
-#    | '(?:[^'\\]+|\\.)*' 
+#    | '(?:[^'\\]+|\\.)*'
 #    )*
 #    {
 #  )
@@ -1010,7 +1011,7 @@ INCLUDEsBLOCkRE = re.compile( r"""
   {
   (.*?) # everything up to close
   }
-""", re.X|re.S ) 
+""", re.X|re.S )
 # TODO str supp
 INCLUDEdFILeRE = re.compile( r"""
   \s*
@@ -1019,7 +1020,7 @@ INCLUDEdFILeRE = re.compile( r"""
   \1
   \s*
   $
-""", re.X|re.M ) 
+""", re.X|re.M )
 
 def find_includes( cut ):
   result = []
@@ -1032,7 +1033,7 @@ def find_includes( cut ):
 
     includedfiles = INCLUDEdFILeRE.finditer( includesblock )
     for i in includedfiles:
-      filename = i.group("file") 
+      filename = i.group("file")
       if filename: # can be empty string because of surrounding spaces issue
         result.append( (filename, b.start() + delta ) )
     delta += b.start() - b.end()
@@ -1067,7 +1068,7 @@ def include_files_recursiv( a, filename, included_sha1 ):
   else:
     if not path.exists( filename ):
       log_err( "File \"%s\" can't be preprocess because it doesn't exist\n"
-          % ( str(filename) ) ) 
+          % ( str(filename) ) )
       raise a_preprocess_error( 63 )
     try:
         with open(filename, "U") as fh:
@@ -1123,7 +1124,7 @@ def flat_newlines( cut ):
   cut.set_str( str(cut).replace("\\\n","") )
 
 #}}}
-#{{{ put_css_on_diet 
+#{{{ put_css_on_diet
 
 def put_css_on_diet( a, error_handler ):
   global log_err
@@ -1150,7 +1151,7 @@ def put_css_on_diet( a, error_handler ):
   apply_mnemonics( contentcut )
   expand_rgba( contentcut )
 
-  contentcut.recover_from_save() 
+  contentcut.recover_from_save()
   if not a.no_header:
     add_header( contentcut )
 
@@ -1228,14 +1229,14 @@ if __name__ == "__main__":
     args.cod_files = leftargs
 
   if args.version:
-    print("Version %s (for specification %s)" % (VERSION, PROToVERSION))
+    print(("Version {} (for specification {})".format(VERSION, PROToVERSION)))
     sys.exit(0)
 
   # has to be after args.version
   if len( args.cod_files ) < 1:
     sys.stderr.write("Error: Give at least one file to preprocess\n")
     sys.exit(1)
-    
+
 
   stdinasfile = 0
   for f in args.cod_files:
@@ -1245,7 +1246,7 @@ if __name__ == "__main__":
   if stdinasfile > 1:
     sys.stderr.write("Only one file can be STDIN (don't use hyphen more than once)\n")
     sys.exit(175)
-    
+
   if args.minify_css:
     args.no_comments = True
     args.no_header = True
