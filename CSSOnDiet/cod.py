@@ -623,9 +623,7 @@ def expand_defines(defines, cutorstr):
           lambda x: expand_argument(arguments, x, defbody), defbody)
 
       if outside:
-        tocutit.append((d.start(),
-                          d.end(),
-                          newbody))
+        tocutit.append((d.start(), d.end(), newbody))
       else:  # inside define block
         cutorstr = cutorstr[:d.start()] + newbody + cutorstr[d.end():]
 
@@ -741,9 +739,7 @@ def move_media(media, cut):
                 break
             else:
               saved[idx][2].append((selector, [decla]))
-            toreplace.append((d.start(),
-                                d.end(),
-                                ""))
+            toreplace.append((d.start(), d.end(), ""))
     cut.replace_preserving(toreplace)
 
     for medianame, mediabody, rules in saved:
@@ -816,9 +812,7 @@ def reduce_arithmetic(cut):
     resultstr = str(result)
     if unit:
       resultstr += unit
-    tochange.append((a.start(1),
-                       a.end(1),
-                       resultstr))
+    tochange.append((a.start(1), a.end(1), resultstr))
   cut.replace_preserving(tochange)
 
 
@@ -860,9 +854,7 @@ def expand_rgba(cut):
   for c in rgba:
     color = c.group(1)
     colorstr = convert_rgba_hex_to_str(color)
-    tochange.append((c.start(1),
-                       c.end(1),
-                       colorstr))
+    tochange.append((c.start(1), c.end(1), colorstr))
   cut.replace_preserving(tochange)
 
 
@@ -926,33 +918,25 @@ def apply_mnemonics(cut):
     declarations = DECLARATIOnRE.finditer(str(cut), r.start(2), r.end(2))
     for d in declarations:
       if d.group("param") in PROPERTyMNEMONICS:
-        toreplace.append((d.start("param"),
-                             d.end("param"),
-                             PROPERTyMNEMONICS[d.group("param")]))
+        toreplace.append((d.start("param"), d.end("param"),
+                          PROPERTyMNEMONICS[d.group("param")]))
 
-      if not ":" in d.group("sep"):
-        toreplace.append((d.start("sep"),
-                           d.start("sep"),  # insert at the begining
-                           ":"))
+      if not ":" in d.group("sep"):  # insert at the begining
+        toreplace.append((d.start("sep"), d.start("sep"), ":"))
 
       values = VALUeRE.finditer(str(cut), d.start("value"), d.end("value"))
       for v in values:
         if v.group(1) in VALUeMNEMONICS:
-          toreplace.append((v.start(1),
-                              v.end(1),
-                              VALUeMNEMONICS[v.group(1)]))
+          toreplace.append((v.start(1), v.end(1), VALUeMNEMONICS[v.group(1)]))
         else:
           units = UNItRE.finditer(str(cut), v.start(1), v.end(1))
           for u in units:
             if u.group(1) in UNItMNEMONICS:
-              toreplace.append((u.start(1),
-                                  u.end(1),
-                                  UNItMNEMONICS[u.group(1)]))
+              toreplace.append((u.start(1), u.end(1),
+                                UNItMNEMONICS[u.group(1)]))
 
-      if d.group("delim") == "\n":
-        toreplace.append((d.start("delim"),
-                           d.start("delim"),  # insert at the begining
-                           ";"))
+      if d.group("delim") == "\n":  # insert at the begining
+        toreplace.append((d.start("delim"), d.start("delim"), ";"))
 
   cut.replace_preserving(toreplace)
 
@@ -1241,8 +1225,8 @@ if __name__ == "__main__":
   parser.add_argument(
     '-I', '--include-dirs', metavar='dir[,dir...]',
     action='append',  # repeating arguments
-    help="List of additional directories to look for included files. " +\
-         "Multiple dirs can be separated by commas or by multiple " +\
+    help="List of additional directories to look for included files. " +
+         "Multiple dirs can be separated by commas or by multiple " +
          "-I(--include-dirs) arguments."
   )
   parser.add_argument(
