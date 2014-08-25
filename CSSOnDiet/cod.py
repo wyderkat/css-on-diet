@@ -8,12 +8,13 @@
 
 #{{{ import
 
-from __future__ import division  # for python2-3 compatibility
+from __future__ import division  # Compatibility
+
+import hashlib
+import math
 import re
 import sys
 from os import path
-import hashlib
-import math
 
 #}}}
 
