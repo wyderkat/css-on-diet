@@ -8,12 +8,13 @@
 
 #{{{ import
 
-from __future__ import division  # for python2-3 compatibility
+from __future__ import division  # Compatibility
+
+import hashlib
+import math
 import re
 import sys
 from os import path
-import hashlib
-import math
 
 #}}}
 
@@ -309,7 +310,8 @@ class a_cut(object):
 
   def last_cut_dinstances(me):
     """ get ( characters after last cut, and last cut absolute position ) """
-    absolutregpos = 0  # absolute register position, because register keeps only relative
+    # absolute register position, because register keeps only relative
+    absolutregpos = 0
     for cut in me.cutregister:
       absolutregpos += cut[0]
     return (len(me.str) - absolutregpos, absolutregpos)
@@ -328,7 +330,9 @@ class a_cut(object):
       laststridx = 0  # pos of last character in string
       newcutreg = []  # updated cut register, constructed by iteration
       lastregidx = 0  # pos of last visited record in register
-      absolutregpos = 0  # absolute register position, because register keeps only relative position from last record.
+      # absolute register position,
+      # because register keeps only relative position from last record.
+      absolutregpos = 0
 
       # following loop assumes indexeswithdata and cutregister are sorted!
       again = False  # flag for visiting register record more than once
@@ -431,7 +435,8 @@ class a_cut(object):
       a = 0
       for cut in newcutreg[:lastindex]:  # the last included cut is before -1
         a += cut[0]
-      oldfilling = len(newstr) - len(str(stringorcut)) - a  # len() - len() means previous text
+      # len() - len() means previous text
+      oldfilling = len(newstr) - len(str(stringorcut)) - a
       mergecut = stringorcut.cutregister
 
       if mergecut:
@@ -595,7 +600,7 @@ DEFINeARGUMENT = re.compile(r"_ARG(\d+)_")
 
 
 def expand_defines(defines, cutorstr):
-  if type(cutorstr) == type(""):
+  if isinstance(cutorstr, str):
     outside = False
   else:
     outside = True
@@ -619,9 +624,7 @@ def expand_defines(defines, cutorstr):
           lambda x: expand_argument(arguments, x, defbody), defbody)
 
       if outside:
-        tocutit.append((d.start(),
-                          d.end(),
-                          newbody))
+        tocutit.append((d.start(), d.end(), newbody))
       else:  # inside define block
         cutorstr = cutorstr[:d.start()] + newbody + cutorstr[d.end():]
 
@@ -729,7 +732,7 @@ def move_media(media, cut):
         splitted = value.split()
         if len(splitted) > 0:
           idx = media.find_index(splitted[-1])
-          if idx != None:
+          if idx is not None:
             decla = d.group().replace(splitted[-1], "")  # remove @medianame
             for selectorsaved, declarationssaved in saved[idx][2]:
               if selectorsaved == selector:
@@ -737,9 +740,7 @@ def move_media(media, cut):
                 break
             else:
               saved[idx][2].append((selector, [decla]))
-            toreplace.append((d.start(),
-                                d.end(),
-                                ""))
+            toreplace.append((d.start(), d.end(), ""))
     cut.replace_preserving(toreplace)
 
     for medianame, mediabody, rules in saved:
@@ -812,9 +813,7 @@ def reduce_arithmetic(cut):
     resultstr = str(result)
     if unit:
       resultstr += unit
-    tochange.append((a.start(1),
-                       a.end(1),
-                       resultstr))
+    tochange.append((a.start(1), a.end(1), resultstr))
   cut.replace_preserving(tochange)
 
 
@@ -825,7 +824,7 @@ def get_arithmetic_units(a):
   unit = None
   all = ARITHMETIcUNITsRE.finditer(a)
   for u in all:
-    if unit == None:
+    if unit is None:
       unit = u.group()
     else:
       if unit != u.group():
@@ -856,9 +855,7 @@ def expand_rgba(cut):
   for c in rgba:
     color = c.group(1)
     colorstr = convert_rgba_hex_to_str(color)
-    tochange.append((c.start(1),
-                       c.end(1),
-                       colorstr))
+    tochange.append((c.start(1), c.end(1), colorstr))
   cut.replace_preserving(tochange)
 
 
@@ -922,33 +919,25 @@ def apply_mnemonics(cut):
     declarations = DECLARATIOnRE.finditer(str(cut), r.start(2), r.end(2))
     for d in declarations:
       if d.group("param") in PROPERTyMNEMONICS:
-        toreplace.append((d.start("param"),
-                             d.end("param"),
-                             PROPERTyMNEMONICS[d.group("param")]))
+        toreplace.append((d.start("param"), d.end("param"),
+                          PROPERTyMNEMONICS[d.group("param")]))
 
-      if not ":" in d.group("sep"):
-        toreplace.append((d.start("sep"),
-                           d.start("sep"),  # insert at the begining
-                           ":"))
+      if not ":" in d.group("sep"):  # insert at the begining
+        toreplace.append((d.start("sep"), d.start("sep"), ":"))
 
       values = VALUeRE.finditer(str(cut), d.start("value"), d.end("value"))
       for v in values:
         if v.group(1) in VALUeMNEMONICS:
-          toreplace.append((v.start(1),
-                              v.end(1),
-                              VALUeMNEMONICS[v.group(1)]))
+          toreplace.append((v.start(1), v.end(1), VALUeMNEMONICS[v.group(1)]))
         else:
           units = UNItRE.finditer(str(cut), v.start(1), v.end(1))
           for u in units:
             if u.group(1) in UNItMNEMONICS:
-              toreplace.append((u.start(1),
-                                  u.end(1),
-                                  UNItMNEMONICS[u.group(1)]))
+              toreplace.append((u.start(1), u.end(1),
+                                UNItMNEMONICS[u.group(1)]))
 
-      if d.group("delim") == "\n":
-        toreplace.append((d.start("delim"),
-                           d.start("delim"),  # insert at the begining
-                           ";"))
+      if d.group("delim") == "\n":  # insert at the begining
+        toreplace.append((d.start("delim"), d.start("delim"), ";"))
 
   cut.replace_preserving(toreplace)
 
@@ -1065,9 +1054,9 @@ def find_includes(cut):
 
 def get_nlcharacter(hdl):
   nl = None
-  if type(hdl.newlines) == type(""):
+  if isinstance(hdl.newlines, str):
     nl = hdl.newlines
-  elif type(hdl.newlines) == type(()):
+  elif isinstance(hdl.newlines, tuple):
     nl = choose_nlcharacter(hdl.newlines)
   return nl
 
@@ -1100,11 +1089,11 @@ def include_files_recursiv(a, filename, included_sha1):
           content = fh.read()
           nlcharacterlist = [get_nlcharacter(fh)]
     except IOError as e:
-      log_err("I have problem reading '%s' file. Exception '%s'.\n" \
+      log_err("I have problem reading '%s' file. Exception '%s'.\n"
               % (str(filename), str(e.strerror)))
       raise a_preprocess_error(111)
     except Exception as e:
-      log_err("I have weird problem probably with '%s' file. Exception '%s'.\n" \
+      log_err("I have weird problem probably with '%s' file. Exception '%s'.\n"
               % (str(filename), str(e)))
       raise a_preprocess_error(32)
 
@@ -1129,14 +1118,15 @@ def include_files_recursiv(a, filename, included_sha1):
       if path.exists(inabsfile):
         break
     else:
-      # this is only for included files, so it is not at the top of this function
-      log_err("File \"%s\" can't be included because it doesn't exist" \
-              " in any of these directories: %s\n" \
+      # this is only for included files,so it is not at the top of this function
+      log_err("File \"%s\" can't be included because it doesn't exist"
+              " in any of these directories: %s\n"
               % (str(infile), str(alldirs)))
       raise a_preprocess_error(67)
 
-    (incontentcut, innlcharacter) = include_files_recursiv(a, inabsfile, included_sha1)
-    if incontentcut == None:
+    (incontentcut, innlcharacter) = include_files_recursiv(a, inabsfile,
+                                                           included_sha1)
+    if incontentcut is None:
       continue
     nlcharacterlist.append(innlcharacter)
     tomerge.append((position, position, incontentcut))
@@ -1161,11 +1151,13 @@ def put_css_on_diet(a, error_handler):
   included_sha1 = []
   nlcharacterlist = []
   for filename in a.cod_files:
-    incontentcut, innlcharacter = include_files_recursiv(a, filename, included_sha1)
-    if incontentcut == None:
+    incontentcut, innlcharacter = include_files_recursiv(a, filename,
+                                                         included_sha1)
+    if incontentcut is None:
       continue
     nlcharacterlist.append(innlcharacter)
-    tomerge.append((0, 0, incontentcut))  # 0 means at the end because contentcut is empty
+    # 0 means at the end because contentcut is empty
+    tomerge.append((0, 0, incontentcut))
   contentcut.replace_preserving(tomerge, merge=True)
   nlcharacter = choose_nlcharacter(nlcharacterlist)
 
@@ -1186,7 +1178,7 @@ def put_css_on_diet(a, error_handler):
   if a.minify_css:
     content = minify_spaces(content)
 
-  if nlcharacter != None:
+  if nlcharacter is not None:
     content = content.replace("\n", nlcharacter)
 
   handleout = open(a.output, 'w') if a.output != "-" else sys.stdout
@@ -1217,7 +1209,7 @@ if __name__ == "__main__":
   parser.add_argument(
     '-o', '--output', metavar="output.css",
     default="-",
-    help='output file to save result css. If not given or "-" string, print to STDOUT'
+    help='output file to save CSS. If not given or "-" string, print to STDOUT'
   )
   parser.add_argument(
     '-c', '--no-comments', action="store_true",
@@ -1234,8 +1226,8 @@ if __name__ == "__main__":
   parser.add_argument(
     '-I', '--include-dirs', metavar='dir[,dir...]',
     action='append',  # repeating arguments
-    help="List of additional directories to look for included files. " +\
-         "Multiple dirs can be separated by commas or by multiple " +\
+    help="List of additional directories to look for included files. " +
+         "Multiple dirs can be separated by commas or by multiple " +
          "-I(--include-dirs) arguments."
   )
   parser.add_argument(
@@ -1268,7 +1260,7 @@ if __name__ == "__main__":
       stdinasfile += 1
 
   if stdinasfile > 1:
-    sys.stderr.write("Only one file can be STDIN (don't use hyphen more than once)\n")
+    sys.stderr.write("Only one file can be STDIN (don't use hyphen twice)\n")
     sys.exit(175)
 
   if args.minify_css:
