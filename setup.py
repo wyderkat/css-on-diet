@@ -27,7 +27,7 @@ setup(
   scripts = ["cod"],
 
   data_files=[
-    ('share/doc/CSSOnDiet', ['Changes','LICENSE','README.md'])
+    ('share/doc/CSSOnDiet', ['changelog','LICENSE','README.md'])
   ],
 
   url='http://www.cofoh.com/css-on-diet',

@@ -4,7 +4,7 @@
 # Licensed under GPL-v3
 ##
 
-DIST=CSSOnDiet/cod.py setup.py LICENSE README.md Changes
+DIST=CSSOnDiet/cod.py setup.py LICENSE README.md changelog
 
 VERSION=$(shell cat cod | grep -E '^VERSION *= *".*"' | grep -oE '[0-9\.]+')
 VERNAME=CSSOnDiet-$(VERSION)
