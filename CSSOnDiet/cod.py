@@ -637,7 +637,7 @@ def expand_defines(defines, cutorstr):
           if inner > 0:
             start = end
             # for every missing ")"
-            for i in xrange(inner):
+            for i in range(inner):
               end = cos.find( ")", end+1 ) # +1 - the end of regex == closing ")"
               if end == -1:
                 break
