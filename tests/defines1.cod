@@ -2,6 +2,7 @@
   M  substring issue
   MAR 12
   CAR MAR19
+  MULTIPLE MAR19MAR14
   GOT 14_ARG1_MAR_ARG2_
   MACROGOT GOT(14,12)
 }
@@ -16,4 +17,11 @@ li {
   pa- GOT(ola , pies  kot ) /* dwa */
   mar MACROGOT
   bac SINGULAR
+  // perenthesis support
+  pa- GOT( one(two()) three() )
+  // missing paretheses
+  pa- GOT( one(two()) three(  )
+  //multiple
+  mal MULTIPLE
+
 }

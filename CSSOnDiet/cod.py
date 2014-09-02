@@ -22,7 +22,7 @@ from os import path
 """ CSS-On-Diet is an easy and fast CSS preprocessor for CSS files. """
 
 
-VERSION = "1.6.2"
+VERSION = "1.6.3"
 PROToVERSION = "1.7"
 
 #{{{ Mnemonics List
@@ -237,6 +237,17 @@ class a_preprocess_error(Exception):
         me.errorcode = errorcode
 
 APpDIR = path.dirname(path.realpath(__file__))
+
+def replace_list( string, thelist ):
+  newstring = ""
+  lastend = 0
+  for start, end, replacement in thelist:
+    newstring += string[lastend:start] + replacement
+    lastend = end
+  newstring += string[lastend:]
+  return newstring
+
+
 
 #}}}
 #{{{ Class a_cut
@@ -569,11 +580,11 @@ class a_defines(object):
       i += 1
     me.db.insert(i, (name, body, patin, patout))
 
-  def get_all(me, out):
-    if out:
-      return [(x[3], x[1]) for x in me.db]
-    else:
+  def get_all(me, inside):
+    if inside:
       return [(x[2], x[1]) for x in me.db]
+    else:
+      return [(x[3], x[1]) for x in me.db]
 
 
 def read_defines(cut):
@@ -600,22 +611,45 @@ DEFINeARGUMENT = re.compile(r"_ARG(\d+)_")
 
 
 def expand_defines(defines, cutorstr):
-  if isinstance(cutorstr, str):
-    outside = False
-  else:
-    outside = True
+  inside = isinstance(cutorstr, str)
 
-  for defpat, defbody in defines.get_all(outside):
+  for defpat, defbody in defines.get_all(inside):
 
-    defcandidate = re.finditer(defpat, str(cutorstr))
+    cos = str(cutorstr)
+    defcandidate = re.finditer(defpat, cos)
     tocutit = []
     for d in defcandidate:
       newbody = defbody
       # find arguments
-      argumentsstring = d.group(1)
       arguments = []
-      if argumentsstring:
-        argumentslist = argumentsstring.split(",")
+      moreparenthesis = True
+      start = d.start(1)
+      savedstart = start
+      #TODO check if the previous end doesn't overlap current one
+      end = d.end(1)
+      finalend = d.end()
+      # if arguments
+      if d.group(1): 
+        # inner partheses support
+        while moreparenthesis:
+          inner = cos.count("(", start, end)
+          # if at least one "(" before previous closing ")"
+          if inner > 0:
+            start = end
+            # for every missing ")"
+            for i in xrange(inner):
+              end = cos.find( ")", end+1 ) # +1 - the end of regex == closing ")"
+              if end == -1:
+                break
+            if end == -1:
+              continue
+          else:
+            moreparenthesis = False
+        if end == -1:
+          continue
+        finalend = end+1
+
+        argumentslist = cos[savedstart:end].split(",")
         for a in argumentslist:
           arguments.append(a.strip())
       # apply arguments
@@ -623,16 +657,18 @@ def expand_defines(defines, cutorstr):
         newbody = DEFINeARGUMENT.sub(
           lambda x: expand_argument(arguments, x, defbody), defbody)
 
-      if outside:
-        tocutit.append((d.start(), d.end(), newbody))
-      else:  # inside define block
-        cutorstr = cutorstr[:d.start()] + newbody + cutorstr[d.end():]
+      # d.start() - begining of whole define
+      # finalend - usually equals to d.end(), but in case of
+      #         inner paretheses is further
+      tocutit.append((d.start(), finalend, newbody))
 
     if tocutit:
-      cutorstr.replace_preserving(tocutit)
+      if inside:
+        cutorstr = replace_list(cutorstr, tocutit)
+      else:
+        cutorstr.replace_preserving(tocutit)
 
   return cutorstr
-
 
 def expand_argument(arguments, matchobject, body):
   no = int(matchobject.group(1))
