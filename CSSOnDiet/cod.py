@@ -675,7 +675,7 @@ def expand_argument(arguments, matchobject, body):
   try:
     return arguments[no - 1]
   except IndexError:
-    log_err("Missing argument for define: '{}'\n".format(body))
+    log_err( "Missing argument for define: '%s'\n" % body ) 
     return ""
 
 #}}}
@@ -1283,7 +1283,7 @@ if __name__ == "__main__":
     args.cod_files = leftargs
 
   if args.version:
-    print(("Version {} (for specification {})".format(VERSION, PROToVERSION)))
+    print("Version %s (for specification %s)" % (VERSION, PROToVERSION))
     sys.exit(0)
 
   # has to be after args.version
