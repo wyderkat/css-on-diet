@@ -1,4 +1,8 @@
-V1.6.3 2014-07-21
+V1.6.4 2014-09-03
+
+  * Defines multiple line arguments
+
+V1.6.3 2014-09-02
 
   * Parentheses support inside define arguments
 

@@ -29,7 +29,7 @@ from os import path
 """ CSS-On-Diet is an easy and fast CSS preprocessor for CSS files. """
 
 
-VERSION = "1.6.3"
+VERSION = "1.6.4"
 PROToVERSION = "1.7"
 
 #{{{ Mnemonics List
@@ -574,7 +574,7 @@ class a_defines(object):
     pat4 = r"(?:\s*\((.*?)\))?"  # optional parentheses
 
     patin = re.compile( pat2 + pat4 ) 
-    patout = re.compile( pat1 + pat2 + pat3 + pat4 ) 
+    patout = re.compile( pat1 + pat2 + pat3 + pat4, re.S ) 
 
     i = 0
     while i < len(me.db):
@@ -678,7 +678,7 @@ def expand_argument( arguments, matchobject, body ):
   try:
     return arguments[ no - 1]
   except IndexError:
-    log_err( "Missing argument for define: '%s'\n" % body ) 
+    #log_err( "Missing argument for define: '%s'\n" % body ) 
     return ""
 
 #}}}
