@@ -29,7 +29,7 @@ from os import path
 """ CSS-On-Diet is an easy and fast CSS preprocessor for CSS files. """
 
 
-VERSION = "1.6.4"
+VERSION = "1.6.5"
 PROToVERSION = "1.7"
 
 #{{{ Mnemonics List
@@ -810,6 +810,7 @@ ARITHMETIcRE = re.compile( r"""
     \d+cm?|
     \d+mm?|
     \d+e?x|
+    \d+s|
     \d+pt|
     \d+pc|
     \d+         # has to be at the end - no unit
@@ -826,6 +827,7 @@ ARITHMETIcUNITsRE = re.compile( r"""
     cm?|
     mm?|
     e?x|
+    s|
     pt|
     pc
                        """,  re.X ) 

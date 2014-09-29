@@ -24,6 +24,7 @@ li {
   mal 21.0/5 // floats
   mal 10r
   mal 10.0+2r
+  animation 10s+2s+1
 }
 
 
