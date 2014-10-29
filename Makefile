@@ -31,8 +31,8 @@ test%: $(TARBALL)
 
 pub: 
 	@git push github master --tags
-cofoh: $(TARBALL)
-	scp $^ Cofoh:cofoh/f/
+cssondiet.com: $(TARBALL)
+	cp $^ ~/cssondiet.com/download
 pypi: $(DIST)
 	python setup.py sdist upload
 pypiinfo: 

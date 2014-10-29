@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:        CSS-On-Diet
 " Maintainer:	   Tomasz Wyderka <wyderkat@cofoh.com>
-" URL:		   http://www.cofoh.com/css-on-diet
+" URL:		   http://cssondiet.com
 " Last Change:	   2014 Apr 29
 " Based On:        CSS3 syntax by fremff <sorathone@gmail.com>
 " Oryginal Author: Claudio Fleiner

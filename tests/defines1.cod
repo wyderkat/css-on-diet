@@ -25,3 +25,10 @@ li {
   mal MULTIPLE
 
 }
+
+.extra_arguments {
+  ma- GOT( one )
+  ma- GOT( one, two )
+  ma- GOT( one, two, three )
+  ma- GOT( one, two, three, four )
+}

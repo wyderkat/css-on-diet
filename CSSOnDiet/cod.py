@@ -29,7 +29,7 @@ from os import path
 """ CSS-On-Diet is an easy and fast CSS preprocessor for CSS files. """
 
 
-VERSION = "1.6.5"
+VERSION = "1.7.0"
 PROToVERSION = "1.7"
 
 #{{{ Mnemonics List
@@ -655,10 +655,19 @@ def expand_defines( defines, cutorstr ):
         argumentslist = cos[savedstart:end].split(",")
         for a in argumentslist:
           arguments.append(a.strip())
+
       # apply arguments
       if arguments:
-        newbody = DEFINeARGUMENT.sub(
-          lambda x: expand_argument(arguments, x, defbody), defbody)
+        highest = 0
+        for arg in DEFINeARGUMENT.finditer( defbody ):
+          no = int( arg.group(1) )
+          if no > highest:
+            highest = no
+        #
+        newbody = DEFINeARGUMENT.sub( lambda x: expand_argument(arguments, x, defbody), defbody)
+        # append extra arguments at the end
+        if highest < len(arguments):
+          newbody += " " + " ".join( arguments[highest:] )
 
       # d.start() - begining of whole define
       # finalend - usually equals to d.end(), but in case of
@@ -1246,7 +1255,7 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(
     description= "CSS-On-Diet - preprocessor for CSS files - ver. %s" % VERSION,
-    epilog="www.cofoh.com/css-on-diet"
+    epilog="cssondiet.com"
   )
 
   parser.add_argument(

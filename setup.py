@@ -30,7 +30,7 @@ setup(
     ('share/doc/CSSOnDiet', ['changelog','LICENSE','README.md'])
   ],
 
-  url='http://www.cofoh.com/css-on-diet',
+  url='http://cssondiet.com',
   author='Tomasz Wyderka',
   author_email='wyderkat@cofoh.com',
 

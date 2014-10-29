@@ -3,7 +3,7 @@ CSS-On-Diet
 
 CSS-On-Diet is a preprocessor for CSS files. The key feature is mnemonics for frequently used properties, which are similar to Emmet abbreviations. Other goodies include intuitive media breakpoints, nested and single line comments, variables and mixins, a calculator, hexadecimal RGBA, minifier, ...
 
-Much more information on [www.cofoh.com/css-on-diet](http://www.cofoh.com/css-on-diet)
+Much more information on [cssondiet.com](http://cssondiet.com)
 
 Features
 ========
@@ -36,7 +36,7 @@ Use mnemonics
       bac #1C6BA0
     }
 
-Common CSS keywords have mnemonics. Parameters are 3 letters long, values 2, and units just 1 letter ([The list](http://www.cofoh.com/css-on-diet-LATEST))
+Common CSS keywords have mnemonics. Parameters are 3 letters long, values 2, and units just 1 letter ([The list](http://cssondiet.com))
 
 Medias Breakpoints
 ------------------
@@ -135,7 +135,7 @@ To perform proper installation you have following choices:
 1. Use/install [pip](https://pip.pypa.io/en/latest/installing.html) 
 and type `pip install CSSOnDiet` (that will download and install CSSOnDiet 
 from [pypi](https://pypi.python.org/pypi))
-2. Download archive from [CSS-On-Diet website](http://cofoh.com/css-on-diet), 
+2. Download archive from [CSS-On-Diet website](http://cssondiet.com/installation), 
 unpack it and run `python setup.py install`
 3. Or clone [this](http://github.com/wyderkat/css-on-diet) github repo 
 and run also `python setup.py install` from it.
