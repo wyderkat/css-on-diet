@@ -29,9 +29,18 @@ from os import path
 """ CSS-On-Diet is an easy and fast CSS preprocessor for CSS files. """
 
 
-VERSION = "1.7.0"
-PROToVERSION = "1.7"
+VERSION = "1.7.1"
+PROToVERSION = "1.8"
 
+#{{{ Prefixes List
+
+PREFIXES = {
+  "box-sizing": ("-webkit-","-moz-"),
+  "transform" : ("-webkit-","-moz-","-ms-","-o-"),
+  "transition": ("-webkit-","-moz-","-ms-","-o-"),
+}
+
+#}}}
 #{{{ Mnemonics List
 
 PROPERTyMNEMONICS = {
@@ -1006,6 +1015,39 @@ def apply_mnemonics( cut ):
   cut.replace_preserving( toreplace )
 
 #}}}
+#{{{ Apply prefixes
+
+def apply_prefixes( cut ):
+  rules = RULeRE.finditer( str(cut) )
+  toreplace = [] # has to be ordered
+  for r in rules:
+
+    declarations = DECLARATIOnRE.finditer( str(cut), r.start(2), r.end(2) )
+    for d in declarations:
+
+      toprefix = []
+
+      if d.group("param") in PREFIXES:
+        toprefix.append( d.group("param") )
+
+      values = VALUeRE.finditer( str(cut), d.start("value"), d.end("value") )
+      for v in values:
+        if v.group(1) in PREFIXES:
+          toprefix.append( v.group(1) )
+
+      if toprefix:
+        byprefix = {}
+        for tp in toprefix:
+          for p in PREFIXES[ tp ]:
+            if p in byprefix:
+              byprefix[ p ] = byprefix[p].replace( tp, p+tp, 1 )
+            else:
+              byprefix[ p ] = d.group().replace( tp, p+tp, 1 )
+        toreplace.append( ( d.start(), d.start(), "".join( byprefix.values() ) ) )
+
+  cut.replace_preserving( toreplace )
+
+#}}}
 #{{{ Header
 
 HEADErRE = re.compile( r"^//!(.*?)\n", re.S )
@@ -1219,6 +1261,8 @@ def put_css_on_diet( a, error_handler ):
   move_media( medias, contentcut )
   apply_mnemonics( contentcut )
   expand_rgba( contentcut )
+  if not a.no_prefix:
+    apply_prefixes( contentcut )
 
   contentcut.recover_from_save() 
   if not a.no_header:
@@ -1270,6 +1314,10 @@ if __name__ == "__main__":
   parser.add_argument(
     '-d', '--no-header', action="store_true",
     help="don't add header line"
+  )
+  parser.add_argument(
+    '-p', '--no-prefix', action="store_true",
+    help="don't add prefixes"
   )
   parser.add_argument(
     '-m', '--minify-css', action="store_true",
