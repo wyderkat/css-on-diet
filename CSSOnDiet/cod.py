@@ -35,9 +35,56 @@ PROToVERSION = "1.8"
 #{{{ Prefixes List
 
 PREFIXES = {
-  "box-sizing": ("-webkit-","-moz-"),
-  "transform" : ("-webkit-","-moz-","-ms-","-o-"),
-  "transition": ("-webkit-","-moz-","-ms-","-o-"),
+  # http://www.w3schools.com/cssref/css3_browsersupport.asp
+  "align-content": ("-webkit-",), 
+  "align-items": ("-webkit-",), 
+  "align-self": ("-webkit-",), 
+  "animation": ("-webkit-",), 
+  "animation-name": ("-webkit-",), 
+  "animation-duration": ("-webkit-",), 
+  "animation-timing-function": ("-webkit-",), 
+  "animation-delay": ("-webkit-",), 
+  "animation-iteration-count": ("-webkit-",), 
+  "animation-direction": ("-webkit-",), 
+  "animation-play-state": ("-webkit-",), 
+  "backface-visibility": ("-webkit-",), 
+  "backface-visibility": ("-webkit-",), 
+  "column-count": ("-webkit-", "-moz-",),
+  "column-fill": ("-webkit-", "-moz-",),
+  "column-gap": ("-webkit-", "-moz-",),
+  "column-rule": ("-webkit-", "-moz-",),
+  "column-rule-color": ("-webkit-", "-moz-",),
+  "column-rule-style": ("-webkit-", "-moz-",),
+  "column-rule-width": ("-webkit-", "-moz-",),
+  "column-span": ("-webkit-", "-moz-",),
+  "column-width": ("-webkit-", "-moz-",),
+  "columns": ("-webkit-", "-moz-",),
+  "flex": ("-webkit-",),
+  "flex-basis": ("-webkit-",),
+  "flex-direction": ("-webkit-",),
+  "flex-flow": ("-webkit-",),
+  "flex-grow": ("-webkit-",),
+  "flex-shrink": ("-webkit-",),
+  "flex-wrap": ("-webkit-",),
+  "font-feature-setting": ("-webkit-", "-moz-",),
+  "hyphens": ("-webkit-", "-moz-", "-ms-",),
+  "image-rendering": ("-moz-",),
+  "justify-content" : ("-webkit-",),
+  "marquee-direction": ("-webkit-",),
+  "marquee-play-count": ("-webkit-",),
+  "marquee-speed": ("-webkit-",),
+  "marquee-style": ("-webkit-",),
+  "order": ("-webkit-",),
+  "perspective": ("-webkit-",),
+  "perspective-origin": ("-webkit-",),
+  "tab-size": ("-moz-",),
+  "text-align-last": ("-moz-",),
+  "text-decoration-color": ("-moz-",),
+  "text-decoration-line": ("-moz-",),
+  "text-decoration-style": ("-moz-",),
+  "transform": ("-webkit-",),
+  "transform-orygin": ("-webkit-",),
+  "transform-style": ("-webkit-",),
 }
 
 #}}}
@@ -1015,7 +1062,7 @@ def apply_mnemonics( cut ):
   cut.replace_preserving( toreplace )
 
 #}}}
-#{{{ Apply prefixes
+#{{{ Apply Prefixes
 
 def apply_prefixes( cut ):
   rules = RULeRE.finditer( str(cut) )
