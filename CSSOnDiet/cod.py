@@ -309,6 +309,36 @@ def replace_list( string, thelist ):
   newstring += string[lastend:]
   return newstring
 
+def nested_regex( str, start, end ):
+  """
+  For a given "str" where "start" points to openchar like (,{, or whatever
+  and "end" points after the first found ),},... find the last closing character
+  in nested manner
+  Return new "end" after last nested character or -1 if nesting not closed
+  """
+  #print "* %d %d %s" % (start,end, str)
+  openchar = str[start]
+  start = start+1 # compatibility with the end
+  closechar = str[end-1]
+  while True:
+    inner = str.count( openchar, start, end)
+    # if at least one openchar before previous closegchar
+    if inner > 0:
+      start = end
+      # for every missing closechar
+      for i in xrange(inner):
+        end = str.find( closechar, end ) 
+        if end == -1:
+          break
+        else:
+          end +=1 # end has to be after the last
+      if end == -1:
+        break
+    else:
+      break # no more char to close
+  return end
+
+
 
 
 #}}}
@@ -596,9 +626,9 @@ def rm_comments( cut, a ):
 DEFINEsBLOCkRE = re.compile( r"""
   @cod-defines?
   \s*
-  {
-  (.*?) # everything up to close
-  $\s* } \s*$    # has to be in separate line
+  ({
+  .*?
+  })
                             """, re.X|re.S|re.M ) 
 
 DEFINeNAMeCHAR = r"[-\w]"
@@ -627,7 +657,7 @@ class a_defines(object):
     pat2 = re.escape( name ) 
     #pat3 = r"(?!%s)" % DEFINeNAMeCHAR
     pat3 = r"\b"
-    pat4 = r"(?:\s*\((.*?)\))?"  # optional parentheses
+    pat4 = r"(?:\s*(\(.*?\)))?"  # optional parentheses
 
     patin = re.compile( pat2 + pat4 ) 
     patout = re.compile( pat1 + pat2 + pat3 + pat4, re.S ) 
@@ -648,11 +678,14 @@ class a_defines(object):
 
 def read_defines( cut ):
   defines = a_defines()
-  blocks = DEFINEsBLOCkRE.finditer( str(cut) )
+  cos = str(cut)
+  blocks = DEFINEsBLOCkRE.finditer( cos )
   to_replace = []
   for b in blocks:
-    definesblock = b.group(1)
-    to_replace.append( ( b.start(), b.end(), "" ) )
+    nestedend = nested_regex( cos, b.start(1), b.end(1) )
+    definesblock = cos[ b.start(1)+1: nestedend-1 ]
+
+    to_replace.append( ( b.start(), nestedend, "" ) )
 
     definesmatch = DEFINEsRE.finditer( definesblock )
     for d in definesmatch:
@@ -681,34 +714,17 @@ def expand_defines( defines, cutorstr ):
       newbody = defbody
       # find arguments
       arguments = []
-      moreparenthesis = True
-      start = d.start(1)
-      savedstart = start
       #TODO check if the previous end doesn't overlap current one
-      end = d.end(1)
-      finalend = d.end()
       # if arguments
+      end = d.end()
       if d.group(1): 
-        # inner partheses support
-        while moreparenthesis:
-          inner = cos.count("(", start, end)
-          # if at least one "(" before previous closing ")"
-          if inner > 0:
-            start = end
-            # for every missing ")"
-            for i in range(inner):
-              end = cos.find( ")", end+1 ) # +1 - the end of regex == closing ")"
-              if end == -1:
-                break
-            if end == -1:
-              continue
-          else:
-            moreparenthesis = False
+        start = d.start(1)
+        end = d.end(1)
+        end = nested_regex( cos, start, end )
         if end == -1:
           continue
-        finalend = end+1
 
-        argumentslist = cos[savedstart:end].split(",")
+        argumentslist = cos[start+1:end-1].split(",")
         for a in argumentslist:
           arguments.append(a.strip())
 
@@ -726,9 +742,7 @@ def expand_defines( defines, cutorstr ):
           newbody += " " + " ".join( arguments[highest:] )
 
       # d.start() - begining of whole define
-      # finalend - usually equals to d.end(), but in case of
-      #         inner paretheses is further
-      tocutit.append((d.start(), finalend, newbody))
+      tocutit.append((d.start(), end, newbody))
 
     if tocutit:
       if inside:

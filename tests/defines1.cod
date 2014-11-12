@@ -8,6 +8,7 @@
 }
 
 @cod-define {
+  OLA {INNER}
   SINGULAR #FF0000
 }
 // before

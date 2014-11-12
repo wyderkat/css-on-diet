@@ -20,6 +20,7 @@ li {
   margin-left: 4.2 /* floats*/;
   margin-left: 10rem;
   margin-left: 12.0rem;
+  -webkit-animation: 13s;
   animation: 13s;
 }
 
