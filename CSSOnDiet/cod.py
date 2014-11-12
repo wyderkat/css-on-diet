@@ -34,6 +34,7 @@ PROToVERSION = "1.8"
 
 #{{{ Prefixes List
 
+# !!! don't forget the period character when a single element in a tuple
 PREFIXES = {
   # http://www.w3schools.com/cssref/css3_browsersupport.asp
   "align-content": ("-webkit-",), 
@@ -85,6 +86,10 @@ PREFIXES = {
   "transform": ("-webkit-",),
   "transform-orygin": ("-webkit-",),
   "transform-style": ("-webkit-",),
+}
+
+ATRULESPREFIXES = {
+  "keyframes": ("-webkit-",)
 }
 
 #}}}
@@ -683,7 +688,9 @@ def read_defines( cut ):
   to_replace = []
   for b in blocks:
     nestedend = nested_regex( cos, b.start(1), b.end(1) )
-    definesblock = cos[ b.start(1)+1: nestedend-1 ]
+    if nestedend == -1:
+      continue
+    definesblock = cos[ b.start(1)+1 : nestedend-1 ]
 
     to_replace.append( ( b.start(), nestedend, "" ) )
 
@@ -1079,11 +1086,13 @@ def apply_mnemonics( cut ):
 #{{{ Apply Prefixes
 
 def apply_prefixes( cut ):
-  rules = RULeRE.finditer( str(cut) )
+  cos = str(cut)
   toreplace = [] # has to be ordered
+
+  rules = RULeRE.finditer( cos )
   for r in rules:
 
-    declarations = DECLARATIOnRE.finditer( str(cut), r.start(2), r.end(2) )
+    declarations = DECLARATIOnRE.finditer( cos, r.start(2), r.end(2) )
     for d in declarations:
 
       toprefix = []
@@ -1091,22 +1100,44 @@ def apply_prefixes( cut ):
       if d.group("param") in PREFIXES:
         toprefix.append( d.group("param") )
 
-      values = VALUeRE.finditer( str(cut), d.start("value"), d.end("value") )
+      values = VALUeRE.finditer( cos, d.start("value"), d.end("value") )
       for v in values:
         if v.group(1) in PREFIXES:
           toprefix.append( v.group(1) )
 
       if toprefix:
-        byprefix = {}
-        for tp in toprefix:
-          for p in PREFIXES[ tp ]:
-            if p in byprefix:
-              byprefix[ p ] = byprefix[p].replace( tp, p+tp, 1 )
-            else:
-              byprefix[ p ] = d.group().replace( tp, p+tp, 1 )
-        toreplace.append( ( d.start(), d.start(), "".join( byprefix.values() ) ) )
+        p = prefix_it( toprefix, PREFIXES, d.group() )
+        toreplace.append( ( d.start(), d.start(), p ) )
 
   cut.replace_preserving( toreplace )
+
+def apply_atrules_prefixes( cut ):
+  cos = str(cut)
+  toreplace = [] 
+
+  for at in ATRULESPREFIXES: # "keyframes"
+    atre = re.compile( r"@%s[^{}]*({.*?})" % at, re.S )
+    atrules = atre.finditer( cos )
+    for r in atrules:
+      nestedend = nested_regex( cos, r.start(1), r.end(1) )
+      if nestedend == -1:
+        continue
+      fullrule = cos[ r.start() : nestedend ]
+
+      p = prefix_it( [at], ATRULESPREFIXES, fullrule )
+      toreplace.append( ( r.start(), r.start(), p ) )
+
+  cut.replace_preserving( toreplace )
+
+def prefix_it( toprefix, table, text ):
+  byprefix = {}
+  for tp in toprefix:
+    for p in table[ tp ]:
+      if p in byprefix:
+        byprefix[ p ] = byprefix[p].replace( tp, p+tp, 1 )
+      else:
+        byprefix[ p ] = text.replace( tp, p+tp, 1 )
+  return "".join( byprefix.values() )
 
 #}}}
 #{{{ Header
@@ -1324,6 +1355,7 @@ def put_css_on_diet( a, error_handler ):
   expand_rgba( contentcut )
   if not a.no_prefix:
     apply_prefixes( contentcut )
+    apply_atrules_prefixes( contentcut )
 
   contentcut.recover_from_save() 
   if not a.no_header:
