@@ -48,8 +48,7 @@ PREFIXES = {
   "animation-iteration-count": ("-webkit-",), 
   "animation-direction": ("-webkit-",), 
   "animation-play-state": ("-webkit-",), 
-  "backface-visibility": ("-webkit-",), 
-  "backface-visibility": ("-webkit-",), 
+  "backface-visibility": ("-webkit-","-ms-"), 
   "column-count": ("-webkit-", "-moz-",),
   "column-fill": ("-webkit-", "-moz-",),
   "column-gap": ("-webkit-", "-moz-",),
@@ -331,7 +330,7 @@ def nested_regex( str, start, end ):
     if inner > 0:
       start = end
       # for every missing closechar
-      for i in xrange(inner):
+      for i in range(inner):
         end = str.find( closechar, end ) 
         if end == -1:
           break
@@ -1131,13 +1130,18 @@ def apply_atrules_prefixes( cut ):
 
 def prefix_it( toprefix, table, text ):
   byprefix = {}
+  order = [] # because no OrderedDict for 2.6
   for tp in toprefix:
     for p in table[ tp ]:
       if p in byprefix:
         byprefix[ p ] = byprefix[p].replace( tp, p+tp, 1 )
       else:
         byprefix[ p ] = text.replace( tp, p+tp, 1 )
-  return "".join( byprefix.values() )
+        order.append( p )
+  result = ""
+  for p in order:
+    result += byprefix[ p ]
+  return result
 
 #}}}
 #{{{ Header

@@ -29,6 +29,7 @@ test_newlines() { one2one newlines; }
 test_media2() { one2one media2; }
 test_values() { one2one values; }
 test_minify1() { minify1; }
+test_prefixes() { one2one prefixes; }
 
 
 oneTimeSetUp()

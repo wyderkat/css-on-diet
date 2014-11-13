@@ -1,0 +1,19 @@
+
+li {
+  align-self ce
+  column-count 2
+  ann mymove
+  backface-visibility: hidden;
+  mal 10p
+  tf- perspective 500px
+  ti- transform scale 20%
+}
+
+@keyframes mymove {
+    from {top: 0px;}
+    to { tf-: scale 20%;}
+}
+
+@keyframes sunrise {
+   0% { bottom: 0; }
+   33% { bottom: 340px; } }
