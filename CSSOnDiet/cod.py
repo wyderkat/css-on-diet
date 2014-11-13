@@ -83,7 +83,7 @@ PREFIXES = {
   "text-decoration-line": ("-moz-",),
   "text-decoration-style": ("-moz-",),
   "transform": ("-webkit-",),
-  "transform-orygin": ("-webkit-",),
+  "transform-origin": ("-webkit-",),
   "transform-style": ("-webkit-",),
 }
 
