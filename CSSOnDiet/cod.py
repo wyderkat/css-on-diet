@@ -21,6 +21,7 @@ import hashlib
 import math
 import re
 import sys
+import time
 from os import path
 
 #}}}
@@ -1337,6 +1338,7 @@ def put_css_on_diet( a, error_handler ):
   global log_err
   log_err = error_handler
 
+  _profiler_start( a )
   contentcut = a_cut( "" ) # empty because it is meta cod file for cmd line args
   tomerge = []
   included_sha1 = []
@@ -1349,26 +1351,35 @@ def put_css_on_diet( a, error_handler ):
     tomerge.append( ( 0, 0, incontentcut ) ) # 0 means at the end because contentcut is empty
   contentcut.replace_preserving( tomerge, merge = True )
   nlcharacter = choose_nlcharacter( nlcharacterlist )
+  _profiler_point(a, "Includes")
 
   definesdict = read_defines( contentcut )
   expand_defines( definesdict, contentcut )
+  _profiler_point(a, "Defines")
   reduce_arithmetic( contentcut )
+  _profiler_point(a, "Arithmetics")
+  expand_rgba( contentcut )
+  _profiler_point(a, "RGBA")
   medias = read_media( contentcut )
   move_media( medias, contentcut )
+  _profiler_point(a, "Medias")
   apply_mnemonics( contentcut )
-  expand_rgba( contentcut )
+  _profiler_point(a, "Mnemonics")
   if not a.no_prefix:
     apply_prefixes( contentcut )
     apply_atrules_prefixes( contentcut )
+    _profiler_point(a, "Prefixer")
 
   contentcut.recover_from_save() 
   if not a.no_header:
     add_header( contentcut )
+  _profiler_point(a, "Comments recover")
 
   content = str(contentcut)
 
   if a.minify_css:
     content = minify_spaces( content )
+    _profiler_point(a, "Minifier")
 
   if nlcharacter is not None:
     content = content.replace("\n", nlcharacter)
@@ -1378,6 +1389,28 @@ def put_css_on_diet( a, error_handler ):
   handleout.write( content )
   if handleout is not sys.stdout:
     handleout.close()
+  _profiler_point(a, "Writer")
+  _profiler_end(a)
+
+def _profiler_start( a ):
+  if a.profile:
+    _profiler_start.time = time.time()
+    _profiler_start.initialtime = _profiler_start.time
+    _profiler_start.file = open( a.profile, "w" )
+
+def _profiler_point( a, label ):
+  if a.profile:
+    now = time.time()
+    delta = now - _profiler_start.time
+    _profiler_start.file.write("%20s %f\n" % (label, delta) )
+    _profiler_start.time = now
+
+def _profiler_end( a ):
+  if a.profile:
+    delta = time.time() - _profiler_start.initialtime
+    _profiler_start.file.write("%s\n%20s %f\n" % 
+       ("="*20 + "|" + "="*8, "Execution time", delta) )
+    _profiler_start.file.close()
 
 #}}}
 #{{{ __main__
@@ -1396,7 +1429,7 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(
     description= "CSS-On-Diet - preprocessor for CSS files - ver. %s" % VERSION,
-    epilog="cssondiet.com"
+    epilog="http://cssondiet.com"
   )
 
   parser.add_argument(
@@ -1426,6 +1459,10 @@ if __name__ == "__main__":
     help="List of additional directories to look for included files. " +\
          "Multiple dirs can be separated by commas or by multiple " +\
          "-I(--include-dirs) arguments."
+  )
+  parser.add_argument(
+    '--profile',  metavar='file',
+    help="Profile the preprocessing execution and save it to file"
   )
   parser.add_argument(
     '-v', '--version',  action="store_true",
