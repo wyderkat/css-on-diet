@@ -220,6 +220,12 @@ PROPERTyMNEMONICS = {
   "tid":"transition-duration",
   "tip":"transition-property",
   "tit":"transition-timing-function",
+  # another variant
+  "ts-":"transition",
+  "tsy":"transition-delay",
+  "tsd":"transition-duration",
+  "tsp":"transition-property",
+  "tst":"transition-timing-function",
 }
 
 VALUeMNEMONICS = {
