@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ###
-# Copyright 2014 Tomasz Wyderka <wyderkat@cofoh.com>
+# Copyright 2014-2015 Tomasz Wyderka <wyderkat@cofoh.com>
 #  www.cofoh.com
 # Licensed under GPL-v3
 ##
@@ -30,7 +30,7 @@ from os import path
 """ CSS-On-Diet is an easy and fast CSS preprocessor for CSS files. """
 
 
-VERSION = "1.7.2"
+VERSION = "1.8"
 PROToVERSION = "1.8"
 
 #{{{ Prefixes List
@@ -60,7 +60,7 @@ PREFIXES = {
   "column-span": ("-webkit-", "-moz-",),
   "column-width": ("-webkit-", "-moz-",),
   "columns": ("-webkit-", "-moz-",),
-  "flex": ("-webkit-",),
+  "flex": ("-webkit-","-ms-"),
   "flex-basis": ("-webkit-",),
   "flex-direction": ("-webkit-",),
   "flex-flow": ("-webkit-",),
@@ -75,7 +75,7 @@ PREFIXES = {
   "marquee-play-count": ("-webkit-",),
   "marquee-speed": ("-webkit-",),
   "marquee-style": ("-webkit-",),
-  "order": ("-webkit-",),
+  "order": ("-webkit-","-ms-flex-"), # not typical
   "perspective": ("-webkit-",),
   "perspective-origin": ("-webkit-",),
   "tab-size": ("-moz-",),
@@ -129,6 +129,18 @@ PROPERTyMNEMONICS = {
   "flo":"float",
   "top":"top",
   "lih":"line-height",
+  "fl-":"flex",
+  "flf":"flex-flow",
+  "fld":"flex-direction",
+  "flw":"flex-wrap",
+  "flg":"flex-grow",
+  "fls":"flex-shrink",
+  "flb":"flex-basis",
+  "ord":"order",
+  "als":"align-self",
+  "ali":"align-items",
+  "alc":"align-content",
+  "juc":"justify-content",
   "b--":"border",
   "bb-":"border-bottom",
   "bbc":"border-bottom-color",
@@ -243,6 +255,7 @@ VALUeMNEMONICS = {
   "ca":"capitalize",
   "cb":"content-box",
   "ce":"center",
+  "co":"column",
   "da":"dashed",
   "db":"double",
   "de":"default",
@@ -251,6 +264,9 @@ VALUeMNEMONICS = {
   "ei":"ease-in",
   "eo":"ease-out",
   "fi":"fixed",
+  "fl":"flex",
+  "fs":"flex-start",
+  "fe":"flex-end",
   "hi":"hidden",
   "ib":"inline-block",
   "if":"infinite",
@@ -274,8 +290,12 @@ VALUeMNEMONICS = {
   "re":"relative",
   "rg":"radial-gradient",
   "ri":"right",
+  "ro":"row",
   "rx":"repeat-x",
   "ry":"repeat-y",
+  "sa":"space-around",
+  "sb":"space-between",
+  "sc":"stretch",
   "so":"solid",
   "st":"static",
   "ta":"table",
@@ -285,6 +305,7 @@ VALUeMNEMONICS = {
   "up":"uppercase",
   "vi":"visible",
   "wh":"white",
+  "wr":"wrap",
 }
 
 UNItMNEMONICS = {

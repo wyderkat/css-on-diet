@@ -1,0 +1,41 @@
+//!cssondiet.com/specification-1.8
+
+// http://codepen.io/HugoGiraudel/pen/pkwqH
+
+@cod-media {
+  Md all and (max-width: 800px)
+  Sm all and (max-width: 600px)
+}
+
+.navigation {
+  li- no
+  ma- 0
+  pa- 0 @Sm
+  
+  ba- deepskyblue
+  
+  dis fl
+  flf ro wr
+  flf co wr @Sm
+  juc fe
+  juc sa @Md
+}
+
+.navigation a {
+  ted no
+  tea ce @Sm
+  col wh
+  dis bl
+  pa- 1e
+  pa- 10p @Sm
+  bt- 1p so #FFFFFF50 @Sm
+  bb- 1p so #FFFFFF19 @Sm
+}
+
+.navigation a:hover {
+  ba- blue
+}
+
+.navigation li:last-of-type a {
+  bb- no @Sm
+}
