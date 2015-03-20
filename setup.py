@@ -2,6 +2,7 @@
 #from setuptools import setup, find_packages
 from distutils.core import setup
 from os import path
+import sys
 
 from CSSOnDiet import cod
 
@@ -14,6 +15,9 @@ except ImportError:
 
 try:
   long_description=read_md('README.md')
+except OSError:
+  print "Pypandoc probably not istalled (just python module)"
+  sys.exit(1)
 except:
   long_description=read_md(path.join('CSSOnDiet','README.md'))
 
