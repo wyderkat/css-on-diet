@@ -1,0 +1,69 @@
+@cod-define {
+  OLA ola _ARG1_
+  KOLA ola _ARG1_ \
+  ofl ,fasd
+}
+
+@cod-define { MA1 ma1 }
+
+@cod-define { 
+  MA2 ma2 _ARG1_ }
+
+@cod-define { 
+  MA3 ma3 }
+
+@cod-define {
+   KOTA {kota}
+}
+
+@cod-define {
+   PSA {psa} tez  }
+
+
+@cod-include {
+  file1.cod
+  file1.cod
+}
+@cod-include { file1.cod }
+@cod-include {
+  "file1.cod"
+  "file1.cod"
+   }
+@cod-include { "file1.cod" }
+@cod-include { file 1.cod }
+
+
+
+
+
+
+
+
+
+@cod-media {
+  OLA ola _ARG1_
+  OLA ola _ARG1_
+}
+
+@cod-media { MA1 ma1 }
+
+@cod-media { 
+  MA2 only screen and (min-width: 320px) }
+
+@cod-media { 
+  MA3 ma3 }
+
+@cod-media {
+   KOTA kota
+}
+
+@cod-media {
+   PSA psa tez  }
+
+OLA
+MA1
+MA2
+MA3
+KOTA
+PSA
+

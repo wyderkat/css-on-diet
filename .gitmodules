@@ -4,3 +4,6 @@
 [submodule "grunt"]
 	path = grunt
 	url = https://github.com/wyderkat/css-on-diet--grunt.git
+[submodule "vim-cod"]
+	path = vim-cod
+	url = ./vim-cod
