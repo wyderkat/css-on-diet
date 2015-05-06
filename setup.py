@@ -1,25 +1,16 @@
 #!/usr/bin/env python
 #from setuptools import setup, find_packages
 from distutils.core import setup
-from os import path
-import sys
 
 from CSSOnDiet import cod
 
 try:
   from pypandoc import convert
-  read_md = lambda f: convert(f, 'rst')
-except ImportError:
-  #print("warning: pypandoc module not found, could not convert Markdown to RST")
-  read_md = lambda f: open(f, 'r').read()
+  long_description = convert('README.md','rst')
+except (ImportError, OSError) as e:
+  print "Pypandoc probably not istalled: %s" % e
+  long_description = open('README.md', 'r').read()
 
-try:
-  long_description=read_md('README.md')
-except OSError:
-  print "Pypandoc probably not istalled (just python module)"
-  sys.exit(1)
-except:
-  long_description=read_md(path.join('CSSOnDiet','README.md'))
 
 setup(
   name="CSSOnDiet",
