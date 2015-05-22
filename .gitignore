@@ -4,3 +4,4 @@ build
 *.swp
 00*
 .tags
+*.egg-info

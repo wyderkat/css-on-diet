@@ -30,10 +30,10 @@ cssondiet.com: $(TARBALL)
 	cp $^ ~/cssondiet.com/download
 
 
-$(TARBALL): $(DIST)
+$(TARBALL): $(DIST) MANIFEST.in
 	python setup.py sdist
 pypi: $(DIST)
-	python setup.py upload
+	python setup.py sdist upload
 pypiinfo: 
 	python setup.py register
 # makes links in the local machine. Root needed
@@ -50,7 +50,6 @@ $(SUBLIME_COD_COPY): CSSOnDiet/cod.py
 
 guide.html: guide.md
 	markdown $< > $@
-
 
 
 .PHONY: all dist test t github cssondiet.com pypi pypiinfo develop install sublime 

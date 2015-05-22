@@ -22,9 +22,7 @@ setup(
     ],
   },
 
-  data_files=[
-    ('share/doc/CSSOnDiet', ['changelog','LICENSE','README.md'])
-  ],
+  include_package_data = True,
 
   url='http://cssondiet.com',
   author='Tomasz Wyderka',
