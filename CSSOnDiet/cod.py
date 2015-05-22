@@ -30,7 +30,7 @@ from os import path
 """ CSS-On-Diet is an easy and fast CSS preprocessor for CSS files. """
 
 
-VERSION = "1.8.3"
+VERSION = "1.8.4"
 PROToVERSION = "1.8"
 
 #{{{ Prefixes List
