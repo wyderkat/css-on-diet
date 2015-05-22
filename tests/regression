@@ -38,7 +38,7 @@ oneTimeSetUp()
   COD_TMP_DIR=`mktemp -d --tmpdir cod-XXX`
   tar xfz ../$TARBALL -C "$COD_TMP_DIR" #> /dev/null
   COD_DIR="$COD_TMP_DIR/$VERDIR"
-  COD="$PYTHON $COD_DIR/cod"
+  COD="$PYTHON $COD_DIR/CSSOnDiet/cod.py"
 }
 
 oneTimeTearDown()

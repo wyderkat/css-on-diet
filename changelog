@@ -1,3 +1,7 @@
+V1.8.2 2015-05-22
+
+  * Setuptools instead of Distutils
+
 V1.8.1 2015-05-06
 
   * Installation issue with pypandoc

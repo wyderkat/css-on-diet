@@ -1,25 +1,26 @@
 #!/usr/bin/env python
-#from setuptools import setup, find_packages
-from distutils.core import setup
+from setuptools import setup
 
 from CSSOnDiet import cod
 
 try:
   from pypandoc import convert
   long_description = convert('README.md','rst')
-except (ImportError, OSError) as e:
-  print "Pypandoc probably not istalled: %s" % e
+except:
   long_description = open('README.md', 'r').read()
-
 
 setup(
   name="CSSOnDiet",
   version=cod.VERSION,
-  description="Easy and fast CSS preprocessor",
+  description="A preprocessor for designers",
   long_description=long_description,
   
   packages = ["CSSOnDiet"],
-  scripts = ["cod"],
+  entry_points={
+    'console_scripts': [
+      'cod = CSSOnDiet.cod:main',
+    ],
+  },
 
   data_files=[
     ('share/doc/CSSOnDiet', ['changelog','LICENSE','README.md'])
@@ -48,16 +49,6 @@ setup(
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
   ],
- 
   # What does your project relate to?
   keywords='CSS preprocessor',
-#
-#    # To provide executable scripts, use entry points in preference to the
-#    # "scripts" keyword. Entry points provide cross-platform support and allow
-#    # pip to create the appropriate form of executable for the target platform.
-#    entry_points={
-#        'console_scripts': [
-#            'CSS-On-Diet=code',
-#        ],
-#    },
 )

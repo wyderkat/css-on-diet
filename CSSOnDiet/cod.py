@@ -30,7 +30,7 @@ from os import path
 """ CSS-On-Diet is an easy and fast CSS preprocessor for CSS files. """
 
 
-VERSION = "1.8.1"
+VERSION = "1.8.2"
 PROToVERSION = "1.8"
 
 #{{{ Prefixes List
@@ -1442,8 +1442,8 @@ def _profiler_end( a ):
 #}}}
 #{{{ __main__
 
-if __name__ == "__main__":
 
+def main():
   try:
     import argparse
     optmode = False
@@ -1543,6 +1543,9 @@ if __name__ == "__main__":
     put_css_on_diet( args, sys.stderr.write )
   except a_preprocess_error as e:
     sys.exit( e.errorcode )
+
+if __name__ == "__main__":
+  main()
 #}}}
 
 # vim: set foldmethod=marker:

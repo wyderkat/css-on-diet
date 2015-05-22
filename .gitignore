@@ -2,11 +2,5 @@ dist
 build
 *.pyc
 *.swp
-a.cod
-b.css
 00*
-
-.prj.taglist
 .tags
-.session.vim
-.viminfo
